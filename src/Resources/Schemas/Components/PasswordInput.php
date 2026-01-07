@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Filament\Forms\Components\TextInput;
 use Illuminate\Validation\Rules\Password;
 
-class PasswordInput
+final class PasswordInput
 {
     public static function make(string $name = 'password'): TextInput
     {

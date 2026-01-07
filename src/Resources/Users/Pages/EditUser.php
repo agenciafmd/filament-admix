@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Agenciafmd\Admix\Resources\Users\Pages;
 
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
@@ -7,7 +9,7 @@ use Agenciafmd\Admix\Resources\Users\UserResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditUser extends EditRecord
+final class EditUser extends EditRecord
 {
     use RedirectBack;
 

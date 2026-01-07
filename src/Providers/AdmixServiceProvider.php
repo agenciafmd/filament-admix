@@ -29,13 +29,13 @@ final class AdmixServiceProvider extends ServiceProvider
 
     private function bootMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
     }
 
     private function bootTranslations(): void
     {
-        $this->loadTranslationsFrom(__DIR__.'/../../lang', 'admix');
-        $this->loadJsonTranslationsFrom(__DIR__.'/../../lang');
+        $this->loadTranslationsFrom(__DIR__ . '/../../lang', 'admix');
+        $this->loadJsonTranslationsFrom(__DIR__ . '/../../lang');
     }
 
     private function registerConfigs(): void

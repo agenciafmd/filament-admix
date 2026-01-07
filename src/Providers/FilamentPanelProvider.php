@@ -48,8 +48,8 @@ final class FilamentPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->discoverPages(in: __DIR__.'/../Pages', for: 'Agenciafmd\Admix\Pages')
-            ->discoverResources(in: __DIR__.'/../Resources', for: 'Agenciafmd\Admix\Resources')
+            ->discoverPages(in: __DIR__ . '/../Pages', for: 'Agenciafmd\Admix\Pages')
+            ->discoverResources(in: __DIR__ . '/../Resources', for: 'Agenciafmd\Admix\Resources')
             ->pages([
                 Dashboard::class,
             ])
@@ -76,7 +76,6 @@ final class FilamentPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
-
 
     private function bootDefaultTableConfigs(): void
     {

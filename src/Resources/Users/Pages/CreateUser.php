@@ -16,9 +16,9 @@ final class CreateUser extends CreateRecord
 
     protected function afterCreate(): void
     {
-//        TODO: https://filamentmastery.com/articles/email-verification-in-filament-userresource-filters-and-actions
-//        $user = $this->record;
-//        $this->sendEmailVerificationNotification($user);
+        //        TODO: https://filamentmastery.com/articles/email-verification-in-filament-userresource-filters-and-actions
+        //        $user = $this->record;
+        //        $this->sendEmailVerificationNotification($user);
     }
 
     //    protected function sendEmailVerificationNotification(Model $user): void
