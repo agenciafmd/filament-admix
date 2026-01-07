@@ -1,0 +1,18 @@
+{
+    "Users": "Usuários",
+    "User": "Usuário",
+    "Name": "Nome",
+    "Email verified at": "Email verificado em",
+    "Password": "Senha",
+    "General": "Geral",
+    "Information": "Informações",
+    "Created at": "Criado em",
+    "Updated at": "Atualizado em",
+    "Is active": "Ativo",
+    "Yes": "Sim",
+    "No": "Não",
+    "Your :model export has completed and :count :rows exported.": "Sua exportação de :model foi concluída e :count :rows foram exportadas.",
+    ":count :rows failed to export.": ":count :rows falharam na exportação.",
+    "rows": "linhas",
+    "row": "linha"
+}

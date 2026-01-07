@@ -1,0 +1,32 @@
+{
+    "name": "agenciafmd/filament-admix",
+    "description": "Filament - Admix",
+    "authors": [
+        {
+            "name": "Irineu Martins Junior",
+            "email": "irineu@fmd",
+            "homepage": "https://fmd.ag/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "filament/filament": "^4.0",
+        "filament/forms": "^4.0",
+        "filament/tables": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Agenciafmd\\Admix\\": "src/",
+            "Agenciafmd\\Admix\\Database\\Factories\\": "database/factories/",
+            "Agenciafmd\\Admix\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Agenciafmd\\Admix\\Providers\\AdmixServiceProvider"
+            ]
+        }
+    }
+}
