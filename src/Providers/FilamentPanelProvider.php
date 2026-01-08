@@ -14,6 +14,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Table;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -44,6 +45,7 @@ final class FilamentPanelProvider extends PanelProvider
 //            ->emailChangeVerification() // TODO
             ->profile()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->maxContentWidth(Width::Full)
             ->font('Inter')
             ->colors([
                 'primary' => Color::Blue,

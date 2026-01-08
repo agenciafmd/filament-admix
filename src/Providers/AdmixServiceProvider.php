@@ -25,6 +25,7 @@ final class AdmixServiceProvider extends ServiceProvider
     private function bootProviders(): void
     {
         $this->app->register(FilamentPanelProvider::class);
+        $this->app->register(CommandServiceProvider::class);
     }
 
     private function bootMigrations(): void
@@ -40,7 +41,7 @@ final class AdmixServiceProvider extends ServiceProvider
 
     private function registerConfigs(): void
     {
-        //        $this->mergeConfigFrom(__DIR__.'/../../config/admix.php', 'admix');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/admix.php', 'admix');
         //        $this->mergeConfigFrom(__DIR__.'/../../config/audit.php', 'audit');
         //        $this->mergeConfigFrom(__DIR__.'/../../config/audit-alias.php', 'audit-alias');
         //        $this->mergeConfigFrom(__DIR__ . '/../config/local-operations.php', 'local-operations');
