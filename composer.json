@@ -13,7 +13,8 @@
         "php": "^8.4",
         "filament/filament": "^4.0",
         "filament/forms": "^4.0",
-        "filament/tables": "^4.0"
+        "filament/tables": "^4.0",
+        "tapp/filament-auditing": "^4.0.6"
     },
     "autoload": {
         "psr-4": {

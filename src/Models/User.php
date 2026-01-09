@@ -19,12 +19,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 #[ScopedBy([AdmixTypeScope::class])]
 #[UseFactory(UserFactory::class)]
-final class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
+final class User extends Authenticatable implements AuditableContract, FilamentUser, HasAvatar, MustVerifyEmail
 {
-    use HasFactory, Notifiable, Prunable, SoftDeletes;
+    use Auditable, HasFactory, Notifiable, Prunable, SoftDeletes;
 
     protected $hidden = [
         'api_token',

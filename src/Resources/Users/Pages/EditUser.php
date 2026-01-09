@@ -15,6 +15,15 @@ final class EditUser extends EditRecord
 
     protected static string $resource = UserResource::class;
 
+    protected $listeners = [
+        'auditRestored',
+    ];
+
+    public function auditRestored(): void
+    {
+        $this->fillForm();
+    }
+
     protected function getHeaderActions(): array
     {
         return [

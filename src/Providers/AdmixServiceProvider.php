@@ -42,7 +42,8 @@ final class AdmixServiceProvider extends ServiceProvider
     private function registerConfigs(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../../config/admix.php', 'admix');
-        //        $this->mergeConfigFrom(__DIR__.'/../../config/audit.php', 'audit');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/audit.php', 'audit');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/filament-auditing.php', 'filament-auditing');
         //        $this->mergeConfigFrom(__DIR__.'/../../config/audit-alias.php', 'audit-alias');
         //        $this->mergeConfigFrom(__DIR__ . '/../config/local-operations.php', 'local-operations');
         //        $this->mergeConfigFrom(__DIR__ . '/../config/upload-configs.php', 'upload-configs');
