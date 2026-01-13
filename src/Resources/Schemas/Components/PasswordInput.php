@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Agenciafmd\Admix\Resources\Schemas\Components;
+
 use Filament\Forms\Components\TextInput;
 use Illuminate\Validation\Rules\Password;
 

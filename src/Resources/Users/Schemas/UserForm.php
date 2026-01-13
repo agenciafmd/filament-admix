@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Schemas;
 
-use DateTimePickerDisabled;
+use Agenciafmd\Admix\Resources\Schemas\Components\DateTimePickerDisabled;
+use Agenciafmd\Admix\Resources\Schemas\Components\FileUploadWithDefault;
+use Agenciafmd\Admix\Resources\Schemas\Components\PasswordInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use FileUploadWithDefault;
-use PasswordInput;
 
 final class UserForm
 {

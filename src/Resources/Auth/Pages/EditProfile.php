@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Auth\Pages;
 
-use DateTimePickerDisabled;
+use Agenciafmd\Admix\Resources\Schemas\Components\DateTimePickerDisabled;
+use Agenciafmd\Admix\Resources\Schemas\Components\FileUploadWithDefault;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use FileUploadWithDefault;
 
 final class EditProfile extends BaseEditProfile
 {
