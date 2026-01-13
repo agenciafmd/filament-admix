@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Agenciafmd\Admix\Providers;
 
 use Agenciafmd\Admix\Resources\Auth\Pages\EditProfile;
+use Filament\Forms\Components\TagsInput;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -31,6 +32,7 @@ final class FilamentPanelProvider extends PanelProvider
     {
         $this->bootDefaultTableConfigs();
         $this->bootDefaultSectionConfigs();
+        $this->bootDefaultTagComponents();
     }
 
     public function panel(Panel $panel): Panel
@@ -93,6 +95,12 @@ final class FilamentPanelProvider extends PanelProvider
     {
         Section::configureUsing(static function (Section $section): void {
             $section->compact();
+        });
+    }
+
+    private function bootDefaultTagComponents(): void {
+        TagsInput::configureUsing(function (TagsInput $component): void {
+            $component->trim();
         });
     }
 }

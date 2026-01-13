@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Agenciafmd\Admix\Resources\Users\Schemas;
 
 use Agenciafmd\Admix\Resources\Schemas\Components\DateTimePickerDisabled;
-use Agenciafmd\Admix\Resources\Schemas\Components\FileUploadWithDefault;
+use Agenciafmd\Admix\Resources\Schemas\Components\ImageUploadWithDefault;
 use Agenciafmd\Admix\Resources\Schemas\Components\PasswordInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -38,10 +38,8 @@ final class UserForm
                             ->required(),
                         PasswordInput::make()
                             ->columnSpan(1),
-                        FileUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
-                            ->avatar()
-                            ->imageEditor()
-                            ->columnSpan(2),
+                        ImageUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
+                            ->avatar(),
                     ])
                     ->collapsible()
                     ->columns()

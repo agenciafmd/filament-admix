@@ -8,7 +8,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Utilities\Get;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
-final class FileUploadWithDefault
+final class ImageUploadWithDefault
 {
     public static function make(
         string $name,
@@ -23,6 +23,15 @@ final class FileUploadWithDefault
                     ->trim()
                     ->append('-' . date('YmdHis') . '-' . random_int(1000, 9999))
                     ->slug() . '.' . str($file->getClientOriginalExtension())->lower(),
-            );
+            )
+            ->imageEditorAspectRatioOptions([
+                '21:9',
+                '16:9',
+                '4:3',
+                '1:1',
+            ])
+            ->image()
+            ->imageEditor()
+            ->columnSpanFull();
     }
 }

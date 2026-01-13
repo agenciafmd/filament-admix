@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Agenciafmd\Admix\Resources\Auth\Pages;
 
 use Agenciafmd\Admix\Resources\Schemas\Components\DateTimePickerDisabled;
-use Agenciafmd\Admix\Resources\Schemas\Components\FileUploadWithDefault;
+use Agenciafmd\Admix\Resources\Schemas\Components\ImageUploadWithDefault;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
@@ -38,10 +38,9 @@ final class EditProfile extends BaseEditProfile
                             ->required(),
                         $this->getPasswordFormComponent(),
                         $this->getPasswordConfirmationFormComponent(),
-                        FileUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
+                        ImageUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
                             ->avatar()
-                            ->imageEditor()
-                            ->columnSpan(2),
+                            ->columnSpanFull(),
                     ])
                     ->collapsible()
                     ->columns()
