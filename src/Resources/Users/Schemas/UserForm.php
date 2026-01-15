@@ -48,10 +48,12 @@ final class UserForm
                     ->schema([
                         Toggle::make('is_active')
                             ->translateLabel()
-                            ->default(true),
+                            ->default(true)
+                            ->columnSpan(2),
                         DateTimePickerDisabled::make('created_at'),
                         DateTimePickerDisabled::make('updated_at'),
                     ])
+                    ->columns()
                     ->collapsible(),
             ])
             ->columns(3);

@@ -14,6 +14,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 final class UsersTable
 {
@@ -46,6 +47,10 @@ final class UsersTable
                         ->exporter(UserExporter::class),
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort(function (Builder $query): Builder {
+                return $query->orderBy('is_active', 'desc')
+                    ->orderBy('name');
+            });
     }
 }
