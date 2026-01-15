@@ -24,14 +24,17 @@ final class ImageUploadWithDefault
                     ->append('-' . date('YmdHis') . '-' . random_int(1000, 9999))
                     ->slug() . '.' . str($file->getClientOriginalExtension())->lower(),
             )
+            ->image()
             ->imageEditorAspectRatioOptions([
                 '21:9',
                 '16:9',
                 '4:3',
                 '1:1',
             ])
-            ->image()
+            ->imageEditorViewportWidth(1920)
+            ->imageEditorViewportHeight(1080)
             ->imageEditor()
+            ->maxSize(1024 * 10)
             ->columnSpanFull();
     }
 }
