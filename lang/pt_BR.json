@@ -14,5 +14,8 @@
     "Your :model export has completed and :count :rows exported.": "Sua exportação de :model foi concluída e :count :rows foram exportadas.",
     ":count :rows failed to export.": ":count :rows falharam na exportação.",
     "rows": "linhas",
-    "row": "linha"
+    "row": "linha",
+    "The :attribute must be a YouTube url.": "O :attribute deve ser uma url do YouTube.",
+    "YouTube Video URL": "Url do vídeo no YouTube",
+    "Slug": "Nome amigável (slug)"
 }

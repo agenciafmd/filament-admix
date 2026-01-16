@@ -14,7 +14,8 @@
         "filament/filament": "^4.0",
         "filament/forms": "^4.0",
         "filament/tables": "^4.0",
-        "tapp/filament-auditing": "^4.0.6"
+        "tapp/filament-auditing": "^4.0.6",
+        "agenciafmd/laravel-support": "v12.x-dev|dev-master"
     },
     "autoload": {
         "psr-4": {
