@@ -6,6 +6,8 @@ namespace Agenciafmd\Admix\Providers;
 
 use Agenciafmd\Admix\Resources\Auth\Pages\EditProfile;
 use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -24,6 +26,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 final class FilamentPanelProvider extends PanelProvider
@@ -32,7 +35,7 @@ final class FilamentPanelProvider extends PanelProvider
     {
         $this->bootDefaultTableConfigs();
         $this->bootDefaultSectionConfigs();
-        $this->bootDefaultTagComponents();
+        $this->bootDefaultFormComponents();
     }
 
     public function panel(Panel $panel): Panel
@@ -98,9 +101,21 @@ final class FilamentPanelProvider extends PanelProvider
         });
     }
 
-    private function bootDefaultTagComponents(): void {
-        TagsInput::configureUsing(function (TagsInput $component): void {
+    private function bootDefaultFormComponents(): void {
+        TagsInput::configureUsing(static function (TagsInput $component): void {
             $component->trim();
+        });
+
+        TextInput::configureUsing(static function (TextInput $textInput): void {
+            $textInput->dehydrateStateUsing(function (?string $state): ?string {
+                return $state ? Str::trim($state) : $state;
+            });
+        });
+
+        Textarea::configureUsing(static function (Textarea $textarea): void {
+            $textarea->dehydrateStateUsing(function (?string $state): ?string {
+                return $state ? Str::trim($state) : $state;
+            });
         });
     }
 }
