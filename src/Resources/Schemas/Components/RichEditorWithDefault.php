@@ -12,6 +12,8 @@ final class RichEditorWithDefault
         string $name,
         string $directory,
     ): RichEditor {
+        $directory = trim($directory, '\/') . '/' . date('Y/m/d');
+
         return RichEditor::make($name)
             ->translateLabel()
             ->toolbarButtons([

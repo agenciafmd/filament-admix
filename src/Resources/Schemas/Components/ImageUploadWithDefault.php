@@ -15,6 +15,8 @@ final class ImageUploadWithDefault
         string $directory,
         string $fileNameField = 'name',
     ): FileUpload {
+        $directory = trim($directory, '\/') . '/' . date('Y/m/d');
+
         return FileUpload::make($name)
             ->translateLabel()
             ->directory("media/{$directory}")
