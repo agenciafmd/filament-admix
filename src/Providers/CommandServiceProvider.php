@@ -25,7 +25,7 @@ final class CommandServiceProvider extends ServiceProvider
 
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
-            $minutes = config('admix.schedule.minutes');
+            $minutes = config('filament-admix.schedule.minutes');
 
             $schedule->command('auth:clear-resets')
                 ->everyFifteenMinutes();
