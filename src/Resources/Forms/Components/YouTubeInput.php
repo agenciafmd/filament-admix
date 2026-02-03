@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Agenciafmd\Admix\Resources\Schemas\Components;
+namespace Agenciafmd\Admix\Resources\Forms\Components;
 
 use Agenciafmd\Support\Helper;
 use Agenciafmd\Support\Rules\YouTubeUrl;

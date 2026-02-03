@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Schemas;
 
-use Agenciafmd\Admix\Resources\Schemas\Components\DateTimePickerDisabled;
-use Agenciafmd\Admix\Resources\Schemas\Components\ImageUploadWithDefault;
-use Agenciafmd\Admix\Resources\Schemas\Components\PasswordInput;
+use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
+use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithDefault;
+use Agenciafmd\Admix\Resources\Forms\Components\PasswordInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\Page;
@@ -50,8 +50,8 @@ final class UserForm
                             ->translateLabel()
                             ->default(true)
                             ->columnSpan(2),
-                        DateTimePickerDisabled::make('created_at'),
-                        DateTimePickerDisabled::make('updated_at'),
+                        DateTimeEntry::make('created_at'),
+                        DateTimeEntry::make('updated_at'),
                     ])
                     ->columns()
                     ->collapsible(),

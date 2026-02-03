@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Auth\Pages;
 
-use Agenciafmd\Admix\Resources\Schemas\Components\DateTimePickerDisabled;
-use Agenciafmd\Admix\Resources\Schemas\Components\ImageUploadWithDefault;
+use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
+use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithDefault;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
@@ -47,8 +47,8 @@ final class EditProfile extends BaseEditProfile
                     ->columnSpan(2),
                 Section::make(__('Information'))
                     ->schema([
-                        DateTimePickerDisabled::make('created_at'),
-                        DateTimePickerDisabled::make('updated_at'),
+                        DateTimeEntry::make('created_at'),
+                        DateTimeEntry::make('updated_at'),
                     ])
                     ->collapsible(),
             ])
