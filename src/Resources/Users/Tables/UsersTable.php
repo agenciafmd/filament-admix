@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Agenciafmd\Admix\Resources\Users\Tables;
 
 use Agenciafmd\Admix\Models\User;
-//use Agenciafmd\Admix\Resources\Users\Exports\UserExporter;
+// use Agenciafmd\Admix\Resources\Users\Exports\UserExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-//use Filament\Actions\ExportBulkAction;
+// use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -47,8 +47,8 @@ final class UsersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-//                    ExportBulkAction::make()
-//                        ->exporter(UserExporter::class),
+                    //                    ExportBulkAction::make()
+                    //                        ->exporter(UserExporter::class),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

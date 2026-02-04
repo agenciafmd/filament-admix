@@ -107,6 +107,7 @@ utilize a relação de valores abaixo para os campos, caso sejam solicitados.
 
 - /database/migrations/YYYY_MM_DD_HHMMSS_create_articles_table.php
 não utilize o metodo `down` e remova os `dock blocks`, caso existam
+separe as migrações em 1 arquivo por recurso ou tabela
 adicione `->index()` para os campos booleanos
 adicione `->nullable()` para os campos que não são obrigatórios
 adicione os campos `created_at`, `updated_at` e `deleted_at` utilizando os metodos `$table->timestamps()` e `$table->softDeletes()`
@@ -391,7 +392,7 @@ a segunda seção deve ser chamada de "Informações" (__('Information')) e cont
         use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadMultipleWithDefault;
         use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithDefault;
         use Agenciafmd\Admix\Resources\Forms\Components\RichEditorWithDefault;
-        use Agenciafmd\Admix\Resources\Forms\Components\YoutubeInput;
+        use Agenciafmd\Admix\Resources\Forms\Components\YouTubeInput;
         use Agenciafmd\Articles\Services\ArticleService;
         use Filament\Forms\Components\DateTimePicker;
         use Filament\Forms\Components\TagsInput;
@@ -580,6 +581,20 @@ no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o
     </code-snippet>
 @endverbatim
 
+- relacionamentos do tipo belongsToMany
+@verbatim
+    <code-snippet name="Example content of belongsToMany relationship field" lang="php">
+        CheckboxList::make('relationship_name')
+            ->translateLabel()
+            ->relationship('relationship_name', 'display_field')
+            ->searchable()
+            ->bulkToggleable()
+            ->columns(5)
+            ->gridDirection(GridDirection::Row)
+            ->columnSpanFull(),
+    </code-snippet>
+@endverbatim
+
 - /src/Resources/Articles/Tables/ArticlesTable.php
 tabela do resource de articles
 a listagem principal dos campos, quando disponíveis, são: title ou name, published_at, star e is_active
@@ -667,6 +682,23 @@ o `BulkActionGroup`, deve conter `DeleteBulkAction::make()`, `ForceDeleteBulkAct
 resource de articles
 @verbatim
     <code-snippet name="Example content of ArticleResource" lang="php">
+        namespace Agenciafmd\Articles\Resources\Articles;
+
+        use Agenciafmd\Articles\Models\Article;
+        use Agenciafmd\Articles\Resources\Articles\Pages\CreateArticle;
+        use Agenciafmd\Articles\Resources\Articles\Pages\EditArticle;
+        use Agenciafmd\Articles\Resources\Articles\Pages\ListArticles;
+        use Agenciafmd\Articles\Resources\Articles\Schemas\ArticleForm;
+        use Agenciafmd\Articles\Resources\Articles\Tables\ArticlesTable;
+        use BackedEnum;
+        use Filament\Resources\Resource;
+        use Filament\Schemas\Schema;
+        use Filament\Support\Icons\Heroicon;
+        use Filament\Tables\Table;
+        use Illuminate\Database\Eloquent\Builder;
+        use Illuminate\Database\Eloquent\SoftDeletingScope;
+        use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
+
         final class ArticleResource extends Resource
         {
             protected static ?string $model = Article::class;

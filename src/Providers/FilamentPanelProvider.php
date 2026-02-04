@@ -101,7 +101,8 @@ final class FilamentPanelProvider extends PanelProvider
         });
     }
 
-    private function bootDefaultFormComponents(): void {
+    private function bootDefaultFormComponents(): void
+    {
         TagsInput::configureUsing(static function (TagsInput $component): void {
             $component->trim();
         });

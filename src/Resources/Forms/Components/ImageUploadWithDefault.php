@@ -15,7 +15,7 @@ final class ImageUploadWithDefault
         string $directory,
         string $fileNameField = 'name',
     ): FileUpload {
-        $directory = trim($directory, '\/') . '/' . date('Y/m/d');
+        $directory = mb_trim($directory, '\/') . '/' . date('Y/m/d');
 
         return FileUpload::make($name)
             ->translateLabel()

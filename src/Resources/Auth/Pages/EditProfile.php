@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Auth\Pages;
 
-use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
 use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithDefault;
+use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;

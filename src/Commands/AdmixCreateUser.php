@@ -7,6 +7,7 @@ namespace Agenciafmd\Admix\Commands;
 use Agenciafmd\Admix\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
+
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
 

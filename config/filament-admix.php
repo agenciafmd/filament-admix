@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-//use Agenciafmd\Articles\ArticlesPlugin;
+// use Agenciafmd\Articles\ArticlesPlugin;
 
 return [
     'schedule' => [
@@ -12,6 +12,6 @@ return [
         'format' => env('ADMIX_TIMESTAMP_FORMAT', 'd/m/Y H:i:s'),
     ],
     'plugins' => [
-//        ArticlesPlugin::make(),
-    ]
+        //        ArticlesPlugin::make(),
+    ],
 ];
