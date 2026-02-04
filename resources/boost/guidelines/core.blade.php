@@ -589,7 +589,7 @@ no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o
             ->relationship('relationship_name', 'display_field')
             ->searchable()
             ->bulkToggleable()
-            ->columns(5)
+            ->columns(3)
             ->gridDirection(GridDirection::Row)
             ->columnSpanFull(),
     </code-snippet>
