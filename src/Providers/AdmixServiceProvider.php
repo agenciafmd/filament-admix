@@ -15,6 +15,8 @@ final class AdmixServiceProvider extends ServiceProvider
         $this->bootMigrations();
 
         $this->bootTranslations();
+
+        $this->bootPublish();
     }
 
     public function register(): void
@@ -26,6 +28,13 @@ final class AdmixServiceProvider extends ServiceProvider
     {
         $this->app->register(FilamentPanelProvider::class);
         $this->app->register(CommandServiceProvider::class);
+    }
+
+    private function bootPublish(): void
+    {
+        $this->publishes([
+            __DIR__ . '/../../config/filament-admix.php' => base_path('config/filament-admix.php'),
+        ], 'filament-admix:config');
     }
 
     private function bootMigrations(): void
