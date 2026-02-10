@@ -57,7 +57,9 @@ final class FilamentPanelProvider extends PanelProvider
             ])
             ->discoverPages(in: __DIR__ . '/../Pages', for: 'Agenciafmd\Admix\Pages')
             ->discoverResources(in: __DIR__ . '/../Resources', for: 'Agenciafmd\Admix\Resources')
-            ->plugins(config('filament-admix.plugins', []))
+            ->plugins(collect(config('filament-admix.plugins', []))
+                ->map(fn ($plugin) => new $plugin())
+                ->toArray())
             ->pages([
                 Dashboard::class,
             ])
