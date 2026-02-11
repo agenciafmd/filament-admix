@@ -12,8 +12,7 @@ final class VideoUploadWithDefault
         string $name,
         string $directory,
         string $fileNameField = 'name',
-    ): FileUpload
-    {
+    ): FileUpload {
         return FileUploadWithDefault::make(
             name: $name,
             directory: $directory,

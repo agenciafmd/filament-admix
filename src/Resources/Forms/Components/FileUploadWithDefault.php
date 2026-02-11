@@ -14,18 +14,17 @@ final class FileUploadWithDefault
         string $name,
         string $directory,
         string $fileNameField = 'name',
-    ): FileUpload
-    {
+    ): FileUpload {
         $directory = mb_trim($directory, '\/') . '/' . date('Y/m/d');
 
         return FileUpload::make($name)
             ->translateLabel()
             ->directory("media/{$directory}")
             ->getUploadedFileNameForStorageUsing(
-                fn(TemporaryUploadedFile $file, Get $get): string => str($get($fileNameField))
-                        ->trim()
-                        ->append('-' . date('YmdHis') . '-' . random_int(1000, 9999))
-                        ->slug() . '.' . str($file->getClientOriginalExtension())->lower(),
+                fn (TemporaryUploadedFile $file, Get $get): string => str($get($fileNameField))
+                    ->trim()
+                    ->append('-' . date('YmdHis') . '-' . random_int(1000, 9999))
+                    ->slug() . '.' . str($file->getClientOriginalExtension())->lower(),
             )
             ->maxSize(1024 * 10)
             ->columnSpanFull();
