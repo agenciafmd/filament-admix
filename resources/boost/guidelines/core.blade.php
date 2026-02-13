@@ -603,6 +603,24 @@ na ação padrão de ordenação (defaultSort), utilize os campos is_active, sta
 o `BulkActionGroup`, deve conter `DeleteBulkAction::make()`, `ForceDeleteBulkAction::make()` e `RestoreBulkAction::make()`
 @verbatim
     <code-snippet name="Example content of ArticlesTable" lang="php">
+        namespace Agenciafmd\Articles\Resources\Articles\Tables;
+
+        use Agenciafmd\Articles\Services\ArticleService;
+        use Filament\Actions\BulkActionGroup;
+        use Filament\Actions\DeleteBulkAction;
+        use Filament\Actions\EditAction;
+        use Filament\Actions\ForceDeleteBulkAction;
+        use Filament\Actions\RestoreBulkAction;
+        use Filament\Forms\Components\DateTimePicker;
+        use Filament\Tables\Columns\TextColumn;
+        use Filament\Tables\Columns\ToggleColumn;
+        use Filament\Tables\Filters\Filter;
+        use Filament\Tables\Filters\SelectFilter;
+        use Filament\Tables\Filters\TernaryFilter;
+        use Filament\Tables\Filters\TrashedFilter;
+        use Filament\Tables\Table;
+        use Illuminate\Database\Eloquent\Builder;
+
         final class ArticlesTable
         {
             public static function configure(Table $table): Table
@@ -632,8 +650,8 @@ o `BulkActionGroup`, deve conter `DeleteBulkAction::make()`, `ForceDeleteBulkAct
                         SelectFilter::make('tags')
                             ->translateLabel()
                             ->options(fn (): array => ArticleService::make()
-                            ->tags()
-                            ->toArray())
+                                ->tags()
+                                ->toArray())
                             ->query(function (Builder $query, array $data): Builder {
                                 return $query->when($data['value'], fn (Builder $query, $value): Builder => $query->whereJsonContains('tags', $value));
                             }),
