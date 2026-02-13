@@ -19,6 +19,7 @@ final class ImageUploadWithDefault
             fileNameField: $fileNameField,
         )
             ->image()
+            ->optimize(format: 'jpg', quality: 95)
             ->imageEditorAspectRatioOptions([
                 '21:9',
                 '16:9',

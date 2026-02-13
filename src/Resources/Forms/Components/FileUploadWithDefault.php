@@ -23,7 +23,7 @@ final class FileUploadWithDefault
             ->getUploadedFileNameForStorageUsing(
                 fn (TemporaryUploadedFile $file, Get $get): string => str($get($fileNameField))
                     ->trim()
-                    ->append('-' . date('YmdHis') . '-' . random_int(1000, 9999))
+                    ->append('-' . date('His') . '-' . random_int(100, 999))
                     ->slug() . '.' . str($file->getClientOriginalExtension())->lower(),
             )
             ->maxSize(1024 * 10)
