@@ -337,6 +337,16 @@ adicionamos no `getHeaderActions` as ações de deletar `DeleteAction::make()`, 
                 'auditRestored',
             ];
 
+            public function getRelationManagers(): array
+            {
+                if ($this->record->trashed()) {
+                    return [];
+                }
+
+                return parent::getRelationManagers();
+            }
+
+
             public function auditRestored(): void
             {
                 $this->fillForm();
