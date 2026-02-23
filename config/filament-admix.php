@@ -12,6 +12,6 @@ return [
         'format' => env('ADMIX_TIMESTAMP_FORMAT', 'd/m/Y H:i:s'),
     ],
     'plugins' => [
-//        ArticlesPlugin::class,
+        //        ArticlesPlugin::class,
     ],
 ];
