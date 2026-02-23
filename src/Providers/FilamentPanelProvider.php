@@ -84,7 +84,8 @@ final class FilamentPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/filament-admix/theme.css', 'filament-admix');
     }
 
     private function bootDefaultTableConfigs(): void

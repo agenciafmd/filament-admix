@@ -9,6 +9,8 @@
     "Created at": "Criado em",
     "Updated at": "Atualizado em",
     "Is active": "Ativo",
+    "Icon": "Ícone",
+    "Icons": "Ícones",
     "Yes": "Sim",
     "No": "Não",
     "Your :model export has completed and :count :rows exported.": "Sua exportação de :model foi concluída e :count :rows foram exportadas.",
