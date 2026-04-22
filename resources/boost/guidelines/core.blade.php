@@ -63,7 +63,7 @@ fabrica de dados para inserirmos no banco
         public function definition(): array
         {
             $title = fake()->sentence(4);
-            $slug = str()->slug($title);
+            $slug = str($title)->slug();
 
             return [
                 'is_active' => fake()->boolean(),
@@ -103,7 +103,7 @@ utilize a relação de valores abaixo para os campos, caso sejam solicitados.
 | video | fake()->youtubeRandomUri() |
 | image | Storage::putFile('fake', fake()->localImage(ratio: '16:9')) |
 | images | collect(range(0, fake()->numberBetween(1, 6)))->map(fn () => Storage::putFile('fake', fake()->localImage(ratio: '16:9'))) ->toArray() |
-| slug | str()->slug($title) |
+| slug | str($title)->slug() |
 
 - /database/migrations/YYYY_MM_DD_HHMMSS_create_articles_table.php
 não utilize o metodo `down` e remova os `dock blocks`, caso existam
