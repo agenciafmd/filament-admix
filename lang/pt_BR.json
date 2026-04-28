@@ -19,5 +19,8 @@
     "row": "linha",
     "The :attribute must be a YouTube url.": "O :attribute deve ser uma url do YouTube.",
     "YouTube Video URL": "Url do vídeo no YouTube",
-    "Slug": "Nome amigável (slug)"
+    "Slug": "Nome amigável (slug)",
+    "Sort": "Ordenação",
+    "Disable reordering": "Salvar",
+    "Enable reordering": "Reordenar"
 }
