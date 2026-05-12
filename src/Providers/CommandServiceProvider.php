@@ -29,6 +29,9 @@ final class CommandServiceProvider extends ServiceProvider
 
             $schedule->command('auth:clear-resets')
                 ->everyFifteenMinutes();
+            $schedule->command('clockwork:clean')
+                ->withoutOverlapping()
+                ->dailyAt("04:{$minutes}");
             $schedule->command('notifications:clear 90')
                 ->withoutOverlapping()
                 ->dailyAt("04:{$minutes}");
