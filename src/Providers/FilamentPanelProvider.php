@@ -18,6 +18,7 @@ use Filament\PanelProvider;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -94,6 +95,20 @@ final class FilamentPanelProvider extends PanelProvider
             $table
                 ->paginated([10, 25, 50, 100])
                 ->defaultPaginationPageOption(100);
+        });
+
+        TextColumn::macro('limitWithTooltip', function (int $limit) {
+            /** @var TextColumn $this */
+            return $this->limit($limit)
+                ->tooltip(function (TextColumn $column): ?string {
+                    $state = $column->getState();
+
+                    if (mb_strlen((string) $state) <= $column->getCharacterLimit()) {
+                        return null;
+                    }
+
+                    return $state;
+                });
         });
     }
 
