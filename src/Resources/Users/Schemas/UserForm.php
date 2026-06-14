@@ -10,6 +10,8 @@ use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -19,43 +21,51 @@ final class UserForm
     {
         return $schema
             ->components([
-                Section::make(__('General'))
+                Grid::make(3)
                     ->schema([
-                        TextInput::make('name')
-                            ->translateLabel()
-                            ->autofocus()
-                            ->minLength(3)
-                            ->maxLength(255)
-                            ->required(),
-                        TextInput::make('email')
-                            ->translateLabel()
-                            ->rules([
-                                'email:rfc,dns',
-                            ])
-                            ->unique(ignoreRecord: true)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (Page $livewire) => $livewire->validateOnly('data.email'))
-                            ->required(),
-                        PasswordInput::make()
-                            ->columnSpan(1),
-                        ImageUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
-                            ->avatar(),
-                    ])
-                    ->collapsible()
-                    ->columns()
-                    ->columnSpan(2),
-                Section::make(__('Information'))
-                    ->schema([
-                        Toggle::make('is_active')
-                            ->translateLabel()
-                            ->default(true)
+                        Group::make([
+                            Section::make(__('General'))
+                                ->schema([
+                                    TextInput::make('name')
+                                        ->translateLabel()
+                                        ->autofocus()
+                                        ->minLength(3)
+                                        ->maxLength(255)
+                                        ->required(),
+                                    TextInput::make('email')
+                                        ->translateLabel()
+                                        ->rules([
+                                            'email:rfc,dns',
+                                        ])
+                                        ->unique(ignoreRecord: true)
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(fn (Page $livewire) => $livewire->validateOnly('data.email'))
+                                        ->required(),
+                                    PasswordInput::make()
+                                        ->columnSpan(1),
+                                    ImageUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
+                                        ->avatar(),
+                                ])
+                                ->collapsible()
+                                ->columns()
+                                ->columnSpan(2),
+                        ])
                             ->columnSpan(2),
-                        DateTimeEntry::make('created_at'),
-                        DateTimeEntry::make('updated_at'),
+                        Group::make([
+                            Section::make(__('Information'))
+                                ->schema([
+                                    Toggle::make('is_active')
+                                        ->translateLabel()
+                                        ->default(true)
+                                        ->columnSpan(2),
+                                    DateTimeEntry::make('created_at'),
+                                    DateTimeEntry::make('updated_at'),
+                                ])
+                                ->columns()
+                                ->collapsible(),
+                        ]),
                     ])
-                    ->columns()
-                    ->collapsible(),
-            ])
-            ->columns(3);
+                    ->columnSpanFull(),
+            ]);
     }
 }
