@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Providers;
 
+use Agenciafmd\Admix\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\ServiceProvider;
 
 final class AdmixServiceProvider extends ServiceProvider
@@ -22,6 +24,8 @@ final class AdmixServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->registerConfigs();
+
+        $this->registerBindings();
     }
 
     private function bootProviders(): void
@@ -62,5 +66,10 @@ final class AdmixServiceProvider extends ServiceProvider
         //        $this->mergeConfigFrom(__DIR__.'/../../config/audit-alias.php', 'audit-alias');
         //        $this->mergeConfigFrom(__DIR__ . '/../config/local-operations.php', 'local-operations');
         //        $this->mergeConfigFrom(__DIR__ . '/../config/upload-configs.php', 'upload-configs');
+    }
+
+    private function registerBindings(): void
+    {
+        $this->app->bind(Authenticatable::class, User::class);
     }
 }

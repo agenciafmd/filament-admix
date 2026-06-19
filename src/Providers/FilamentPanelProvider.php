@@ -71,6 +71,7 @@ final class FilamentPanelProvider extends PanelProvider
             ])
             ->authGuard('admix-web')
             ->authPasswordBroker('admix-users')
+            ->databaseNotifications()
             ->profile(EditProfile::class, isSimple: false)
             ->middleware([
                 EncryptCookies::class,
