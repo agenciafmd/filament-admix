@@ -17,6 +17,7 @@ final class IconPickerWithDefault
             ->sets([
                 'heroicons',
                 'tabler',
+                'frontend',
             ]);
     }
 }
