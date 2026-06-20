@@ -16,7 +16,10 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Operation;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -136,6 +139,23 @@ final class FilamentPanelProvider extends PanelProvider
             $textarea->dehydrateStateUsing(function (?string $state): ?string {
                 return $state ? Str::trim($state) : $state;
             });
+        });
+
+        TextInput::macro('generateSlug', function (string $slugField = 'slug') {
+            /** @var TextInput $this */
+            return $this
+                ->live(onBlur: true)
+                ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state, string $operation) use ($slugField): void {
+                    if ($operation === Operation::Edit->value) {
+                        return;
+                    }
+
+                    if (($get($slugField) ?? '') !== str($old)->slug()->toString()) {
+                        return;
+                    }
+
+                    $set($slugField, str($state)->slug()->toString());
+                });
         });
     }
 }
