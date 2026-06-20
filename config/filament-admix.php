@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use Agenciafmd\Articles\ArticlesPlugin;
+use Illuminate\Support\Str;
 
 return [
     'schedule' => [
-        'minutes' => mb_substr(base_convert(preg_replace('/[^0-9a-z]/', '', mb_strtolower((string) env('APP_NAME'))), 36, 5), 0, 2),
+        'minutes' => mb_substr(base_convert(Str::slug((string) env('APP_NAME')), 36, 5), 0, 2),
     ],
     'timestamp' => [
         'format' => env('ADMIX_TIMESTAMP_FORMAT', 'd/m/Y H:i:s'),
