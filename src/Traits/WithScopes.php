@@ -12,7 +12,7 @@ trait WithScopes
     #[Scope]
     public static function isActive(Builder $query): void
     {
-        $query->where($query->qualifyColumn('active'), true);
+        $query->where($query->qualifyColumn('is_active'), true);
     }
 
     #[Scope]
