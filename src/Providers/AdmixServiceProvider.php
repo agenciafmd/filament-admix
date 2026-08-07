@@ -30,6 +30,7 @@ final class AdmixServiceProvider extends ServiceProvider
 
     private function bootProviders(): void
     {
+        $this->app->register(BladeServiceProvider::class);
         $this->app->register(FilamentPanelProvider::class);
         $this->app->register(CommandServiceProvider::class);
     }
