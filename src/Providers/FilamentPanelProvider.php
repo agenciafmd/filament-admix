@@ -27,7 +27,8 @@ use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Foundation\Vite;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Str;
@@ -55,19 +56,31 @@ final class FilamentPanelProvider extends PanelProvider
             ->profile()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->maxContentWidth(Width::Full)
-            ->font('Inter')
-            ->colors([
+            ->font(config('filament-admix.font', 'Inter'))
+            ->colors(config('filament-admix.colors', [
                 'primary' => Color::Blue,
-            ])
-            ->discoverPages(in: __DIR__ . '/../Pages', for: 'Agenciafmd\Admix\Pages')
-            ->discoverResources(in: __DIR__ . '/../Resources', for: 'Agenciafmd\Admix\Resources')
+            ]))
+            ->brandLogo(fn (): string => app(Vite::class)->asset('resources/filament/filament-admix/svg/logo.svg', 'filament-admix'))
+            ->brandLogoHeight('2rem')
+            ->favicon(fn (): string => app(Vite::class)->asset('resources/filament/filament-admix/svg/favicon.svg', 'filament-admix'))
+            ->discoverPages(
+                in: __DIR__ . '/../Pages',
+                for: 'Agenciafmd\Admix\Pages',
+            )
+            ->discoverResources(
+                in: __DIR__ . '/../Resources',
+                for: 'Agenciafmd\Admix\Resources',
+            )
             ->plugins(collect(config('filament-admix.plugins', []))
                 ->map(fn ($plugin) => new $plugin())
                 ->toArray())
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(
+                in: app_path('Filament/Widgets'),
+                for: 'App\Filament\Widgets',
+            )
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
@@ -82,7 +95,7 @@ final class FilamentPanelProvider extends PanelProvider
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
+                PreventRequestForgery::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
@@ -90,7 +103,7 @@ final class FilamentPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->viteTheme('resources/css/filament/filament-admix/theme.css', 'filament-admix');
+            ->viteTheme('resources/filament/filament-admix/css/theme.css', 'filament-admix');
     }
 
     private function bootDefaultTableConfigs(): void
@@ -150,11 +163,15 @@ final class FilamentPanelProvider extends PanelProvider
                         return;
                     }
 
-                    if (($get($slugField) ?? '') !== str($old)->slug()->toString()) {
+                    if (($get($slugField) ?? '') !== str($old)
+                        ->slug()
+                        ->toString()) {
                         return;
                     }
 
-                    $set($slugField, str($state)->slug()->toString());
+                    $set($slugField, str($state)
+                        ->slug()
+                        ->toString());
                 });
         });
     }
