@@ -37,6 +37,7 @@ Ex.
 /lang/pt_BR.json
 /src/Models/Article.php
 /src/Providers/ArticleServiceProvider.php
+/src/Providers/CommandServiceProvider.php
 /src/Resources/Articles/Pages/CreateArticle.php
 /src/Resources/Articles/Pages/EditArticle.php
 /src/Resources/Articles/Pages/ListArticles.php
@@ -271,7 +272,7 @@ responsável por registrar os recursos do pacote
 
             private function bootProviders(): void
             {
-                //
+                $this->app->register(CommandServiceProvider::class);
             }
 
             private function bootMigrations(): void
@@ -288,6 +289,37 @@ responsável por registrar os recursos do pacote
             private function registerConfigs(): void
             {
                 $this->mergeConfigFrom(__DIR__ . '/../../config/local-articles.php', 'local-articles');
+            }
+        }
+    </code-snippet>
+@endverbatim
+
+- /src/Providers/CommandServiceProvider.php
+responsável por registrar os comandos e agendamentos do pacote
+@verbatim
+    <code-snippet name="Example content of CommandServiceProvider" lang="php">
+        final class CommandServiceProvider extends ServiceProvider
+        {
+            public function boot(): void
+            {
+                if (! $this->app->runningInConsole()) {
+                    return;
+                }
+
+                $this->commands([
+                    //
+                ]);
+
+                $this->app->booted(function () {
+                    $schedule = $this->app->make(Schedule::class);
+                    $minutes = config('filament-admix.schedule.minutes');
+
+                    $schedule->command('model:prune', [
+                        '--model' => [
+                            Article::class,
+                        ],
+                    ])->dailyAt("03:{$minutes}");
+                });
             }
         }
     </code-snippet>
