@@ -43,7 +43,7 @@ final class AdmixServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../../resources/theme/css' => resource_path('filament/filament-admix/css'),
             __DIR__ . '/../../resources/theme/svg' => resource_path('filament/filament-admix/svg'),
-            __DIR__ . '/../../resources/vite.admix.config.js' => base_path('vite.admix.config.js'),
+            __DIR__ . '/../../resources/theme/vite.admix.config.js' => base_path('vite.admix.config.js'),
             __DIR__ . '/../../lang/pt_BR/icon-picker.php' => base_path('lang/vendor/filament-icon-picker/pt_BR/icon-picker.php'),
         ], 'filament-admix:theme');
     }
