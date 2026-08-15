@@ -31,6 +31,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Vite;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -60,9 +61,9 @@ final class FilamentPanelProvider extends PanelProvider
             ->colors(config('filament-admix.colors', [
                 'primary' => Color::Blue,
             ]))
-            ->brandLogo(fn (): string => app(Vite::class)->asset('resources/filament/filament-admix/svg/logo.svg', 'filament-admix'))
+            ->brandLogo(fn (): HtmlString => new HtmlString(file_get_contents(resource_path('filament/filament-admix/svg/logo.svg'))))
             ->brandLogoHeight('2rem')
-            ->favicon(fn (): string => app(Vite::class)->asset('resources/filament/filament-admix/svg/favicon.svg', 'filament-admix'))
+            ->favicon(fn (): HtmlString => new HtmlString(file_get_contents(resource_path('filament/filament-admix/svg/favicon.svg'))))
             ->discoverPages(
                 in: __DIR__ . '/../Pages',
                 for: 'Agenciafmd\Admix\Pages',
