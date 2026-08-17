@@ -22,5 +22,6 @@
     "Slug": "Nome amigável (slug)",
     "Sort": "Ordenação",
     "Disable reordering": "Salvar",
-    "Enable reordering": "Reordenar"
+    "Enable reordering": "Reordenar",
+    "This is a staging environment and the information entered will not be reflected in the production environment.": "Este é o ambiente de homologação e as informações inseridas não serão refletidas no ambiente de produção."
 }

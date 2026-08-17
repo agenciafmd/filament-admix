@@ -21,16 +21,18 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Operation;
 use Filament\Support\Enums\Width;
+use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
-use Illuminate\Foundation\Vite;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -42,6 +44,7 @@ final class FilamentPanelProvider extends PanelProvider
         $this->bootDefaultTableConfigs();
         $this->bootDefaultSectionConfigs();
         $this->bootDefaultFormComponents();
+        $this->bootStagingAlert();
     }
 
     public function panel(Panel $panel): Panel
@@ -175,5 +178,17 @@ final class FilamentPanelProvider extends PanelProvider
                         ->toString());
                 });
         });
+    }
+
+    private function bootStagingAlert(): void
+    {
+        if (config('app.env') === 'production') {
+            return;
+        }
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_START,
+            fn (): string => Blade::render('filament-admix::filament.staging-banner'),
+        );
     }
 }
