@@ -27,6 +27,13 @@ Ex.
 },
 ```
 
+### Convenções de código
+
+- todo arquivo PHP começa com `declare(strict_types=1);`
+- classes de Model, Resource, Schema (Form), Table, Service, ServiceProvider e Pages (Create/Edit/List) são `final class`
+- quando o Model utilizar mais de um trait, declare um `use` por linha (não combine em uma única linha)
+- métodos que sobrescrevem método de classe pai (ex.: `casts()`) recebem o atributo `#[Override]` (`use Override;`)
+
 ### Estrutura de arquivos
 
 /config/local-articles.php
@@ -49,16 +56,20 @@ Ex.
 
 - /config/local-articles.php
 configuração do pacote
+
 @verbatim
     <code-snippet name="Example content of config/local-articles.php" lang="php">
         return [
             'name' => 'Articles',
+            'navigation_group' => null,
+            'navigation_sort' => 6,
         ];
     </code-snippet>
 @endverbatim
 
 - /database/factories/ArticleFactory.php
 fabrica de dados para inserirmos no banco
+
 @verbatim
     <code-snippet name="Example content of ArticleFactory" lang="php">
         public function definition(): array
@@ -112,6 +123,7 @@ separe as migrações em 1 arquivo por recurso ou tabela
 adicione `->index()` para os campos booleanos
 adicione `->nullable()` para os campos que não são obrigatórios
 adicione os campos `created_at`, `updated_at` e `deleted_at` utilizando os metodos `$table->timestamps()` e `$table->softDeletes()`
+
 @verbatim
     <code-snippet name="Example content of create_articles_table migration" lang="php">
         public function up(): void
@@ -156,6 +168,7 @@ adicione os campos `created_at`, `updated_at` e `deleted_at` utilizando os metod
 @endverbatim
 
 - /database/seeders/ArticleSeeder.php
+
 @verbatim
     <code-snippet name="Example content of ArticleSeeder" lang="php">
         public function run(): void
@@ -171,6 +184,7 @@ adicione os campos `created_at`, `updated_at` e `deleted_at` utilizando os metod
 @endverbatim
 
 - /lang/pt_BR/fields.php
+
 @verbatim
     <code-snippet name="Example content of fields" lang="php">
         return [
@@ -181,6 +195,7 @@ adicione os campos `created_at`, `updated_at` e `deleted_at` utilizando os metod
 
 - /lang/pt_BR.json
 utilizado para aplicar traduções nos labels dos campos
+
 @verbatim
     <code-snippet name="Example content of pt_BR.json" lang="json">
         {
@@ -204,8 +219,15 @@ utilizado para aplicar traduções nos labels dos campos
 
 - /src/Models/Article.php
 não utilizar o fillable
+utilize a trait `WithScopes` (`Agenciafmd\Admix\Traits\WithScopes`) para os scopes `isActive` e `sort` — ela lê a propriedade `$defaultSort` do Model, então não reimplemente ordenação manualmente
+
 @verbatim
     <code-snippet name="Example of content of Article" lang="php">
+        declare(strict_types=1);
+
+        namespace Agenciafmd\Articles\Models;
+
+        use Agenciafmd\Admix\Traits\WithScopes;
         use Agenciafmd\Articles\Database\Factories\ArticleFactory;
         use Illuminate\Database\Eloquent\Attributes\UseFactory;
         use Illuminate\Database\Eloquent\Builder;
@@ -213,13 +235,25 @@ não utilizar o fillable
         use Illuminate\Database\Eloquent\Model;
         use Illuminate\Database\Eloquent\Prunable;
         use Illuminate\Database\Eloquent\SoftDeletes;
+        use Override;
         use OwenIt\Auditing\Auditable;
         use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
         #[UseFactory(ArticleFactory::class)]
-        class Article extends Model implements AuditableContract
+        final class Article extends Model implements AuditableContract
         {
-            use Auditable, HasFactory, Prunable, SoftDeletes;
+            use Auditable;
+            use HasFactory;
+            use Prunable;
+            use SoftDeletes;
+            use WithScopes;
+
+            protected array $defaultSort = [
+                'is_active' => 'desc',
+                'star' => 'desc',
+                'published_at' => 'desc',
+                'title' => 'asc',
+            ];
 
             public function prunable(): Builder
             {
@@ -227,6 +261,7 @@ não utilizar o fillable
                     ->where('deleted_at', '<=', now()->subDays(30));
             }
 
+            #[Override]
             protected function casts(): array
             {
                 return [
@@ -250,10 +285,19 @@ utilize a relação de valores abaixo para os campos no casts, caso sejam solici
 | images | array |
 | published_at | timestamps |
 
+a ordem de `$defaultSort`, quando disponíveis, segue os campos: is_active, star, published_at e title ou name
+
 - /src/Providers/ArticleServiceProvider.php
 responsável por registrar os recursos do pacote
+
 @verbatim
     <code-snippet name="Example content of ArticleServiceProvider" lang="php">
+        declare(strict_types=1);
+
+        namespace Agenciafmd\Articles\Providers;
+
+        use Illuminate\Support\ServiceProvider;
+
         final class ArticleServiceProvider extends ServiceProvider
         {
             public function boot(): void
@@ -296,8 +340,17 @@ responsável por registrar os recursos do pacote
 
 - /src/Providers/CommandServiceProvider.php
 responsável por registrar os comandos e agendamentos do pacote
+
 @verbatim
     <code-snippet name="Example content of CommandServiceProvider" lang="php">
+        declare(strict_types=1);
+
+        namespace Agenciafmd\Articles\Providers;
+
+        use Agenciafmd\Articles\Models\Article;
+        use Illuminate\Console\Scheduling\Schedule;
+        use Illuminate\Support\ServiceProvider;
+
         final class CommandServiceProvider extends ServiceProvider
         {
             public function boot(): void
@@ -327,15 +380,18 @@ responsável por registrar os comandos e agendamentos do pacote
 
 - /src/Resources/Articles/Pages/CreateArticle.php
 registramos o resource de articles e aplicamos o trait RedirectBack para retornar para a lista após criar um novo registro
+
 @verbatim
     <code-snippet name="Example content of CreateArticle" lang="php">
+        declare(strict_types=1);
+
         namespace Agenciafmd\Articles\Resources\Articles\Pages;
 
         use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
         use Agenciafmd\Articles\Resources\Articles\ArticleResource;
         use Filament\Resources\Pages\CreateRecord;
 
-        class CreateArticle extends CreateRecord
+        final class CreateArticle extends CreateRecord
         {
             use RedirectBack;
 
@@ -348,8 +404,11 @@ registramos o resource de articles e aplicamos o trait RedirectBack para retorna
 registramos o resource de articles e aplicamos o trait RedirectBack para retornar para a lista após criar um novo registro
 registramos o listener de `auditRestored` para atualizamos o registro após restaurar do audit
 adicionamos no `getHeaderActions` as ações de deletar `DeleteAction::make()`, forçar deleção (ForceDeleteAction::make()) e restaurar (RestoreAction::make())
+
 @verbatim
     <code-snippet name="Example content of EditArticle" lang="php">
+        declare(strict_types=1);
+
         namespace Agenciafmd\Articles\Resources\Articles\Pages;
 
         use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
@@ -359,7 +418,7 @@ adicionamos no `getHeaderActions` as ações de deletar `DeleteAction::make()`, 
         use Filament\Actions\RestoreAction;
         use Filament\Resources\Pages\EditRecord;
 
-        class EditArticle extends EditRecord
+        final class EditArticle extends EditRecord
         {
             use RedirectBack;
 
@@ -377,7 +436,6 @@ adicionamos no `getHeaderActions` as ações de deletar `DeleteAction::make()`, 
 
                 return parent::getRelationManagers();
             }
-
 
             public function auditRestored(): void
             {
@@ -399,15 +457,18 @@ adicionamos no `getHeaderActions` as ações de deletar `DeleteAction::make()`, 
 - /src/Resources/Articles/Pages/ListArticles.php
 registramos o resource de articles
 adicionamos no `getHeaderActions` as ações de criar novo registro `CreateAction::make()`
+
 @verbatim
     <code-snippet name="Example content of ListArticles" lang="php">
+        declare(strict_types=1);
+
         namespace Agenciafmd\Articles\Resources\Articles\Pages;
 
         use Agenciafmd\Articles\Resources\Articles\ArticleResource;
         use Filament\Actions\CreateAction;
         use Filament\Resources\Pages\ListRecords;
 
-        class ListArticles extends ListRecords
+        final class ListArticles extends ListRecords
         {
             protected static string $resource = ArticleResource::class;
 
@@ -423,27 +484,28 @@ adicionamos no `getHeaderActions` as ações de criar novo registro `CreateActio
 
 - /src/Resources/Articles/Schemas/ArticleForm.php
 formulário do resource de articles
-separe os campos em seções (Section)
-a primeira seção deve ser chamada de "Geral" (__('General')) e conter os campos principais do recurso
-a segunda seção deve ser chamada de "Informações" (__('Information')) e conter os campos `is_active`, `star`, `published_at`, `created_at` e `updated_at`, caso sejam solicitados
+o layout externo é um `Grid::make(3)` com dois `Group`: o primeiro (`columnSpan(2)`) contém a seção "Geral" (__('General')) com os campos principais do recurso, o segundo contém a seção "Informações" (__('Information')) com os campos `is_active`, `star`, `published_at`, `created_at` e `updated_at`, caso sejam solicitados
+
 @verbatim
     <code-snippet name="Example content of ArticleForm" lang="php">
+        declare(strict_types=1);
+
         namespace Agenciafmd\Articles\Resources\Articles\Schemas;
 
-        use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
         use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadMultipleWithDefault;
         use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithDefault;
         use Agenciafmd\Admix\Resources\Forms\Components\RichEditorWithDefault;
         use Agenciafmd\Admix\Resources\Forms\Components\YouTubeInput;
+        use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
         use Agenciafmd\Articles\Services\ArticleService;
         use Filament\Forms\Components\DateTimePicker;
         use Filament\Forms\Components\TagsInput;
         use Filament\Forms\Components\Textarea;
         use Filament\Forms\Components\TextInput;
         use Filament\Forms\Components\Toggle;
+        use Filament\Schemas\Components\Grid;
+        use Filament\Schemas\Components\Group;
         use Filament\Schemas\Components\Section;
-        use Filament\Schemas\Components\Utilities\Get;
-        use Filament\Schemas\Components\Utilities\Set;
         use Filament\Schemas\Schema;
 
         final class ArticleForm
@@ -452,66 +514,67 @@ a segunda seção deve ser chamada de "Informações" (__('Information')) e cont
             {
                 return $schema
                     ->components([
-                        Section::make(__('General'))
+                        Grid::make(3)
                             ->schema([
-                                TextInput::make('title')
-                                    ->translateLabel()
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
-                                        if (($get('slug') ?? '') !== str($old)->slug()->toString()) {
-                                            return;
-                                        }
-
-                                        $set('slug', str($state)->slug()->toString());
-                                        })
-                                    ->autofocus()
-                                    ->minLength(3)
-                                    ->maxLength(255)
-                                    ->required(),
-                                TextInput::make('slug')
-                                    ->translateLabel()
-                                    ->unique()
-                                    ->required(),
-                                Textarea::make('summary')
-                                    ->translateLabel()
-                                    ->required()
-                                    ->rows(5)
-                                    ->columnSpanFull(),
-                                RichEditorWithDefault::make(name: 'content', directory: 'article/content')
-                                    ->translateLabel()
-                                    ->required()
-                                    ->columnSpanFull(),
-                                YouTubeInput::make(),
-                                ImageUploadWithDefault::make(name: 'image', directory: 'article/image', fileNameField: 'title'),
-                                ImageUploadMultipleWithDefault::make(name: 'images', directory: 'article/images', fileNameField: 'title'),
-                                TagsInput::make('tags')
-                                    ->translateLabel()
-                                    ->suggestions(fn (): array => ArticleService::make()
-                                    ->tags()
-                                    ->toArray())
-                                    ->columnSpanFull(),
+                                Group::make([
+                                    Section::make(__('General'))
+                                        ->schema([
+                                            TextInput::make('title')
+                                                ->translateLabel()
+                                                ->generateSlug()
+                                                ->autofocus()
+                                                ->minLength(3)
+                                                ->maxLength(255)
+                                                ->required(),
+                                            TextInput::make('slug')
+                                                ->translateLabel()
+                                                ->unique()
+                                                ->required(),
+                                            Textarea::make('summary')
+                                                ->translateLabel()
+                                                ->required()
+                                                ->rows(5)
+                                                ->columnSpanFull(),
+                                            RichEditorWithDefault::make(name: 'content', directory: 'article/content')
+                                                ->translateLabel()
+                                                ->required()
+                                                ->columnSpanFull(),
+                                            YouTubeInput::make(),
+                                            ImageUploadWithDefault::make(name: 'image', directory: 'article/image', fileNameField: 'title'),
+                                            ImageUploadMultipleWithDefault::make(name: 'images', directory: 'article/images', fileNameField: 'title'),
+                                            TagsInput::make('tags')
+                                                ->translateLabel()
+                                                ->suggestions(fn (): array => ArticleService::make()
+                                                    ->tags()
+                                                    ->toArray())
+                                                ->columnSpanFull(),
+                                        ])
+                                        ->collapsible()
+                                        ->columns()
+                                        ->columnSpan(2),
+                                ])
+                                    ->columnSpan(2),
+                                Group::make([
+                                    Section::make(__('Information'))
+                                        ->schema([
+                                            Toggle::make('is_active')
+                                                ->translateLabel()
+                                                ->default(true),
+                                            Toggle::make('star')
+                                                ->translateLabel()
+                                                ->default(false),
+                                            DateTimePicker::make('published_at')
+                                                ->translateLabel()
+                                                ->columnSpanFull(),
+                                            DateTimeEntry::make('created_at'),
+                                            DateTimeEntry::make('updated_at'),
+                                        ])
+                                        ->collapsible()
+                                        ->columns(),
+                                ]),
                             ])
-                            ->collapsible()
-                            ->columns()
-                            ->columnSpan(2),
-                        Section::make(__('Information'))
-                            ->schema([
-                                Toggle::make('is_active')
-                                    ->translateLabel()
-                                    ->default(true),
-                                Toggle::make('star')
-                                    ->translateLabel()
-                                    ->default(false),
-                                DateTimePicker::make('published_at')
-                                    ->translateLabel()
-                                    ->columnSpanFull(),
-                                DateTimeEntry::make('created_at'),
-                                DateTimeEntry::make('updated_at'),
-                            ])
-                            ->collapsible()
-                            ->columns(),
-                    ])
-                    ->columns(3);
+                            ->columnSpanFull(),
+                    ]);
             }
         }
     </code-snippet>
@@ -519,18 +582,13 @@ a segunda seção deve ser chamada de "Informações" (__('Information')) e cont
 
 utilize a relação de valores abaixo para os campos do formulário, caso sejam solicitados.
 - title ou name
+- utilize o macro `->generateSlug()` (registrado em `TextInput`) para sincronizar automaticamente o campo `slug` — não reimplemente o closure manual de `afterStateUpdated`
+
 @verbatim
     <code-snippet name="Example content of title ou name field" lang="php">
         TextInput::make('title')
             ->translateLabel()
-            ->live(onBlur: true)
-            ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
-                if (($get('slug') ?? '') !== str($old)->slug()->toString()) {
-                    return;
-                }
-
-                $set('slug', str($state)->slug()->toString());
-            })
+            ->generateSlug()
             ->autofocus()
             ->minLength(3)
             ->maxLength(255)
@@ -539,6 +597,7 @@ utilize a relação de valores abaixo para os campos do formulário, caso sejam 
 @endverbatim
 
 - slug
+
 @verbatim
     <code-snippet name="Example content of slug field" lang="php">
         TextInput::make('slug')
@@ -549,6 +608,7 @@ utilize a relação de valores abaixo para os campos do formulário, caso sejam 
 @endverbatim
 
 - sumary ou description
+
 @verbatim
     <code-snippet name="Example content of summary or description field" lang="php">
         Textarea::make('summary')
@@ -560,6 +620,7 @@ utilize a relação de valores abaixo para os campos do formulário, caso sejam 
 @endverbatim
 
 - video
+
 @verbatim
     <code-snippet name="Example content of video field" lang="php">
         YouTubeInput::make(),
@@ -567,6 +628,7 @@ utilize a relação de valores abaixo para os campos do formulário, caso sejam 
 @endverbatim
 
 - tags
+
 @verbatim
     <code-snippet name="Example content of tags field" lang="php">
         TagsInput::make('tags')
@@ -581,6 +643,7 @@ utilize a relação de valores abaixo para os campos do formulário, caso sejam 
 - image
 no valor do campo `directory`, utilize o formato `{recurso}/{campo}`, ex: `article/image`
 no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o caso
+
 @verbatim
     <code-snippet name="Example content of image field" lang="php">
         ImageUploadWithDefault::make(name: 'image', directory: 'article/image', fileNameField: 'title'),
@@ -590,13 +653,15 @@ no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o
 - images
 no valor do campo `directory`, utilize o formato `{recurso}/{campo}`, ex: `article/images`
 no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o caso
+
 @verbatim
-    <code-snippet name="Example content of image field" lang="php">
-        ImageUploadWithDefault::make(name: 'image', directory: 'article/image', fileNameField: 'title'),
+    <code-snippet name="Example content of images field" lang="php">
+        ImageUploadMultipleWithDefault::make(name: 'images', directory: 'article/images', fileNameField: 'title'),
     </code-snippet>
 @endverbatim
 
 - is_active
+
 @verbatim
     <code-snippet name="Example content of is_active field" lang="php">
         Toggle::make('is_active')
@@ -606,6 +671,7 @@ no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o
 @endverbatim
 
 - star
+
 @verbatim
     <code-snippet name="Example content of star field" lang="php">
         Toggle::make('is_active')
@@ -615,6 +681,7 @@ no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o
 @endverbatim
 
 - published_at
+
 @verbatim
     <code-snippet name="Example content of published_at field" lang="php">
         DateTimePicker::make('published_at')
@@ -624,6 +691,7 @@ no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o
 @endverbatim
 
 - relacionamentos do tipo belongsToMany
+
 @verbatim
     <code-snippet name="Example content of belongsToMany relationship field" lang="php">
         CheckboxList::make('relationship_name')
@@ -641,10 +709,13 @@ no valor do campo `fileNameField`, utilize o campo `title` ou `name`, conforme o
 tabela do resource de articles
 a listagem principal dos campos, quando disponíveis, são: title ou name, published_at, star e is_active
 os filtros principais, quando disponíveis, são: is_active, star, tags e published_at
-na ação padrão de ordenação (defaultSort), utilize os campos is_active, star, published_at e title ou name
+na ação padrão de ordenação (defaultSort), utilize o scope `sort` da trait `WithScopes` (`$query->sort()`) — ele já ordena pelos campos definidos em `$defaultSort` no Model
 o `BulkActionGroup`, deve conter `DeleteBulkAction::make()`, `ForceDeleteBulkAction::make()` e `RestoreBulkAction::make()`
+
 @verbatim
     <code-snippet name="Example content of ArticlesTable" lang="php">
+        declare(strict_types=1);
+
         namespace Agenciafmd\Articles\Resources\Articles\Tables;
 
         use Agenciafmd\Articles\Services\ArticleService;
@@ -727,12 +798,7 @@ o `BulkActionGroup`, deve conter `DeleteBulkAction::make()`, `ForceDeleteBulkAct
                             RestoreBulkAction::make(),
                         ]),
                     ])
-                    ->defaultSort(function (Builder $query): Builder {
-                        return $query->orderBy('is_active', 'desc')
-                            ->orderBy('star', 'desc')
-                            ->orderBy('published_at', 'desc')
-                            ->orderBy('title');
-                    });
+                    ->defaultSort(fn (Builder $query): Builder => $query->sort());
             }
         }
     </code-snippet>
@@ -740,8 +806,12 @@ o `BulkActionGroup`, deve conter `DeleteBulkAction::make()`, `ForceDeleteBulkAct
 
 - /src/Resources/Articles/ArticleResource.php
 resource de articles
+`getNavigationSort()` e `getNavigationGroup()` leem do config do pacote, permitindo reordenar/reagrupar o menu sem alterar código
+
 @verbatim
     <code-snippet name="Example content of ArticleResource" lang="php">
+        declare(strict_types=1);
+
         namespace Agenciafmd\Articles\Resources\Articles;
 
         use Agenciafmd\Articles\Models\Article;
@@ -775,6 +845,16 @@ resource de articles
             public static function getPluralModelLabel(): string
             {
                 return __('Articles');
+            }
+
+            public static function getNavigationSort(): ?int
+            {
+                return config('local-articles.navigation_sort');
+            }
+
+            public static function getNavigationGroup(): ?string
+            {
+                return config('local-articles.navigation_group');
             }
 
             public static function form(Schema $schema): Schema
@@ -818,8 +898,17 @@ resource de articles
 serviço do resource de articles
 usado quando precisamos de regras de negócio específicas
 no caso abaixo, para obter a lista de tags únicas já cadastradas e utilizarmos no formulário e tabela
+
 @verbatim
     <code-snippet name="Example content of ArticleService" lang="php">
+        declare(strict_types=1);
+
+        namespace Agenciafmd\Articles\Services;
+
+        use Agenciafmd\Articles\Models\Article;
+        use Illuminate\Database\Eloquent\Builder;
+        use Illuminate\Support\Collection;
+
         final class ArticleService
         {
             public static function make(): static
@@ -849,8 +938,17 @@ no caso abaixo, para obter a lista de tags únicas já cadastradas e utilizarmos
 - /src/ArticlesPlugin.php
 classe principal do pacote
 aqui registramos o resource no painel administrativo (admix)
+
 @verbatim
     <code-snippet name="Example content of ArticlesPlugin" lang="php">
+        declare(strict_types=1);
+
+        namespace Agenciafmd\Articles;
+
+        use Agenciafmd\Articles\Resources\Articles\ArticleResource;
+        use Filament\Contracts\Plugin;
+        use Filament\Panel;
+
         final class ArticlesPlugin implements Plugin
         {
             public static function make(): static
@@ -878,3 +976,27 @@ aqui registramos o resource no painel administrativo (admix)
         }
     </code-snippet>
 @endverbatim
+
+### Componentes reutilizáveis do Admix
+
+Antes de criar um novo componente de formulário, verifique se já existe um equivalente no pacote `filament-admix`. Evite reimplementar upload de arquivo/vídeo, seletor de ícone, campo de senha, etc.
+
+| componente | namespace | descrição |
+|------------+-----------+-----------|
+| ImageUploadWithDefault | Agenciafmd\Admix\Resources\Forms\Components | upload de imagem única, com editor de imagem |
+| ImageUploadMultipleWithDefault | Agenciafmd\Admix\Resources\Forms\Components | upload de múltiplas imagens, com editor de imagem |
+| FileUploadWithDefault | Agenciafmd\Admix\Resources\Forms\Components | upload de arquivo genérico, com nome de arquivo derivado de outro campo |
+| VideoUploadWithDefault | Agenciafmd\Admix\Resources\Forms\Components | upload de vídeo (mp4), baseado em FileUploadWithDefault |
+| RichEditorWithDefault | Agenciafmd\Admix\Resources\Forms\Components | editor de texto rico (rich editor) com configuração padrão do pacote |
+| YouTubeInput | Agenciafmd\Admix\Resources\Forms\Components | campo de URL de vídeo do YouTube |
+| IconPickerWithDefault | Agenciafmd\Admix\Resources\Forms\Components | seletor de ícone (heroicons/tabler/frontend) |
+| PasswordInput | Agenciafmd\Admix\Resources\Forms\Components | campo de senha com regra de validação e `dehydrated` condicional |
+| DateTimePickerDisabled | Agenciafmd\Admix\Resources\Forms\Components | campo de data/hora desabilitado, oculto na criação (ex.: `created_at`/`updated_at` editáveis só na edição) |
+| DateTimeEntry | Agenciafmd\Admix\Resources\Infolists\Components | exibição (infolist) de data/hora, usado em `created_at`/`updated_at` no formulário |
+
+Traits e concerns reutilizáveis:
+
+| trait/concern | namespace | descrição |
+|------------+-----------+-----------|
+| RedirectBack | Agenciafmd\Admix\Resources\Concerns | usado nas Pages de Create/Edit para retornar à listagem após salvar |
+| WithScopes | Agenciafmd\Admix\Traits | fornece os scopes `isActive` e `sort` para o Model; leia `$defaultSort` em vez de reimplementar ordenação |
