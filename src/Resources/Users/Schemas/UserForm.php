@@ -43,8 +43,6 @@ final class UserForm
                                         ->required(),
                                     PasswordInput::make()
                                         ->columnSpan(1),
-                                    ImageUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
-                                        ->avatar(),
                                 ])
                                 ->collapsible()
                                 ->columns()
@@ -58,6 +56,9 @@ final class UserForm
                                         ->translateLabel()
                                         ->default(true)
                                         ->columnSpanFull(),
+                                    ImageUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
+                                        ->avatar()
+                                        ->alignCenter(),
                                     DateTimeEntry::make('created_at'),
                                     DateTimeEntry::make('updated_at'),
                                 ])
