@@ -1,2 +1,78 @@
 @import "../../../../vendor/filament/filament/resources/css/theme.css";
 @source '../../../../vendor/guava/filament-icon-picker/resources/**/*';
+
+/*
+ * Upload em formato textual.
+ *
+ * Aplique com ->extraAttributes(['class' => 'fi-fo-file-upload-textual']) no FileUpload.
+ * Troca o painel do FilePond (cartão branco + bloco escuro do arquivo) por uma linha de
+ * texto com as ações ao lado, para caber numa célula de repeater em tabela.
+ */
+.fi-fo-file-upload-textual {
+    /* cartão branco em volta do campo */
+    & .filepond--root {
+        @apply mb-0 bg-transparent shadow-none ring-0;
+    }
+
+    & .filepond--panel-root {
+        @apply hidden;
+    }
+
+    /* bloco escuro atrás do nome do arquivo */
+    & .filepond--item-panel {
+        @apply hidden;
+    }
+
+    & .filepond--item {
+        @apply mx-0;
+    }
+
+    /* o recuo à esquerda espelha o respiro que o botão de remover tem na borda direita */
+    & .filepond--file {
+        @apply items-center py-0 pe-0 ps-2 text-gray-950 dark:text-white;
+    }
+
+    /*
+     * O botão de remover é posicionado de forma absoluta na borda; esta margem reserva o
+     * espaço dele, senão os ícones de abrir/baixar ficam por baixo.
+     */
+    & .filepond--file-info {
+        @apply me-9!;
+    }
+
+    & .filepond--file-info-main {
+        @apply flex items-center gap-2 text-sm font-normal;
+    }
+
+    /* tamanho do arquivo em bytes */
+    & .filepond--file-info-sub {
+        @apply hidden;
+    }
+
+    & .filepond--file-status {
+        @apply hidden;
+    }
+
+    & .filepond--file-action-button {
+        @apply bg-transparent text-gray-400 shadow-none hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200;
+    }
+
+    /*
+     * Os ícones de baixar/abrir são a própria cor de fundo do elemento recortada por uma
+     * máscara SVG. O padrão é branco, feito para o painel escuro do FilePond — sem painel,
+     * ficariam invisíveis.
+     */
+    & .filepond--download-icon,
+    & .filepond--open-icon {
+        @apply me-0! shrink-0 bg-gray-400! hover:bg-gray-700! dark:bg-gray-500! dark:hover:bg-gray-200!;
+    }
+
+    /* área de "arraste e solte": só faz sentido enquanto não há arquivo */
+    & .filepond--drop-label {
+        @apply p-0!;
+    }
+
+    & .filepond--root:has(.filepond--item) .filepond--drop-label {
+        @apply hidden;
+    }
+}
