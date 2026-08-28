@@ -9,6 +9,7 @@ use Agenciafmd\Admix\Commands\AuditPrune;
 use Agenciafmd\Admix\Commands\NotificationsClear;
 use Agenciafmd\Admix\Models\User;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 
 final class CommandServiceProvider extends ServiceProvider
@@ -32,6 +33,18 @@ final class CommandServiceProvider extends ServiceProvider
             $schedule->command('auth:clear-resets')
                 ->everyFifteenMinutes();
             $schedule->command('clockwork:clean')
+                ->before(function () {
+                    if (config('clockwork.storage') !== 'files') {
+                        return;
+                    }
+
+                    $path = config('clockwork.storage_files_path') . '/index';
+                    $content = '';
+                    if (! File::exists($path)) {
+                        File::ensureDirectoryExists(dirname($path));
+                        File::put($path, $content);
+                    }
+                })
                 ->withoutOverlapping()
                 ->dailyAt("04:{$minutes}");
             $schedule->command('notifications:clear 90')
@@ -49,7 +62,8 @@ final class CommandServiceProvider extends ServiceProvider
                 '--model' => [
                     User::class,
                 ],
-            ])->dailyAt("03:{$minutes}");
+            ])
+                ->dailyAt("03:{$minutes}");
         });
     }
 }
