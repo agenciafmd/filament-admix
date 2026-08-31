@@ -153,7 +153,10 @@ ações de criar novo registro `CreateAction::make()`
 - /src/Resources/Articles/ArticleResource.php resource de articles `getNavigationSort()` e `getNavigationGroup()` leem
 do config do pacote, permitindo reordenar/reagrupar o menu sem alterar código `form()`/`table()` só delegam pras classes
 `ArticleForm`/`ArticlesTable` — veja as skills `filament-admix-form-fields` e `filament-admix-table-conventions` pra
-montar o conteúdo delas
+montar o conteúdo delas `getRelations()` lista os RelationManagers do recurso, sempre com o
+`AuditsRelationManager::class` por último; os RelationManagers próprios do pacote ficam em
+/src/Resources/Articles/RelationManagers/ e as convenções deles (nome, localização entre pacotes, modo só leitura) estão
+na skill `filament-admix-table-conventions`
 
 @boostsnippet('Example content of ArticleResource', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Resources\Articles; use Agenciafmd\Articles\Models\Article;
