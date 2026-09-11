@@ -50,7 +50,7 @@ adicione `->nullable()` para os campos que não são obrigatórios adicione os c
 - /database/seeders/ArticleSeeder.php
 
 @boostsnippet('Example content of ArticleSeeder', 'php')
-    public function run(): void { Article::query() ->truncate(); Article::factory() ->count(50) ->create(); }
+    public function run(): void { Schema::withoutForeignKeyConstraints(fn () => Article::query() ->truncate()); ArticleFactory::new() ->count(50) ->create(); }
 @endboostsnippet
 
 - /lang/pt_BR/fields.php
