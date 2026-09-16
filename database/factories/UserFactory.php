@@ -7,6 +7,9 @@ namespace Agenciafmd\Admix\Database\Factories;
 use Agenciafmd\Admix\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<User>
+ */
 final class UserFactory extends Factory
 {
     protected $model = User::class;
@@ -15,8 +18,8 @@ final class UserFactory extends Factory
     {
         return [
             'is_active' => true,
-            'name' => fake()->name,
-            'email' => fake()->unique()->safeEmail,
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
             'password' => 'secret',
         ];
     }

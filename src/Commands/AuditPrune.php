@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use OwenIt\Auditing\Models\Audit;
 
+#[Description('Prune audit records that are no longer needed')]
+#[Signature('audit:prune
+        {days=180 : How many days you want to keep the audits.}')]
 final class AuditPrune extends Command
 {
-    protected $signature = 'audit:prune
-        {days=180 : How many days you want to keep the audits.}';
-
-    protected $description = 'Prune audit records that are no longer needed';
-
     public function handle(): void
     {
         $days = (int) $this->argument('days');

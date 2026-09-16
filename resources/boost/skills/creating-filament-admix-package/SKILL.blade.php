@@ -50,7 +50,8 @@ adicione `->nullable()` para os campos que não são obrigatórios adicione os c
 - /database/seeders/ArticleSeeder.php
 
 @boostsnippet('Example content of ArticleSeeder', 'php')
-    public function run(): void { Schema::withoutForeignKeyConstraints(fn () => Article::query() ->truncate()); ArticleFactory::new() ->count(50) ->create(); }
+    public function run(): void { Schema::withoutForeignKeyConstraints(fn () => Article::query() ->truncate());
+    ArticleFactory::new() ->count(50) ->create(); }
 @endboostsnippet
 
 - /lang/pt_BR/fields.php
@@ -188,7 +189,7 @@ específicas no caso abaixo, para obter a lista de tags únicas já cadastradas 
 @boostsnippet('Example content of ArticleService', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Services; use Agenciafmd\Articles\Models\Article; use
     Illuminate\Database\Eloquent\Builder; use Illuminate\Support\Collection; final class ArticleService { public static
-    function make(): static { return app(self::class); } public function tags(): Collection { return
+    function make(): static { return resolve(self::class); } public function tags(): Collection { return
     $this->queryBuilder() ->pluck('tags') ->filter() ->flatten() ->unique() ->mapWithKeys(fn ($item) => [$item =>
     $item]) ->sort(); } private function queryBuilder(): Builder { return Article::query(); } }
 @endboostsnippet
@@ -198,7 +199,7 @@ específicas no caso abaixo, para obter a lista de tags únicas já cadastradas 
 @boostsnippet('Example content of ArticlesPlugin', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles; use Agenciafmd\Articles\Resources\Articles\ArticleResource;
     use Filament\Contracts\Plugin; use Filament\Panel; final class ArticlesPlugin implements Plugin { public static
-    function make(): static { return app(self::class); } public function getId(): string { return 'articles'; } public
-    function register(Panel $panel): void { $panel ->resources([ ArticleResource::class, ]); } public function
+    function make(): static { return resolve(self::class); } public function getId(): string { return 'articles'; }
+    public function register(Panel $panel): void { $panel ->resources([ ArticleResource::class, ]); } public function
     boot(Panel $panel): void { // } }
 @endboostsnippet

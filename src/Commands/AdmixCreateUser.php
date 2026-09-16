@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Agenciafmd\Admix\Commands;
 
 use Agenciafmd\Admix\Models\User;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
 
+#[Description('Create a admix user')]
+#[Signature('admix:create-user')]
 final class AdmixCreateUser extends Command
 {
-    protected $signature = 'admix:create-user';
-
-    protected $description = 'Create a admix user';
-
     public function handle(): void
     {
         $name = text(

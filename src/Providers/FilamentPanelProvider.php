@@ -76,7 +76,7 @@ final class FilamentPanelProvider extends PanelProvider
                 for: 'Agenciafmd\Admix\Resources',
             )
             ->plugins(collect(config('filament-admix.plugins', []))
-                ->map(fn ($plugin) => new $plugin())
+                ->map(fn ($plugin): object => new $plugin())
                 ->toArray())
             ->pages([
                 Dashboard::class,
@@ -147,15 +147,11 @@ final class FilamentPanelProvider extends PanelProvider
         });
 
         TextInput::configureUsing(static function (TextInput $textInput): void {
-            $textInput->dehydrateStateUsing(function (?string $state): ?string {
-                return $state ? Str::trim($state) : $state;
-            });
+            $textInput->dehydrateStateUsing(fn (?string $state): ?string => $state ? Str::trim($state) : $state);
         });
 
         Textarea::configureUsing(static function (Textarea $textarea): void {
-            $textarea->dehydrateStateUsing(function (?string $state): ?string {
-                return $state ? Str::trim($state) : $state;
-            });
+            $textarea->dehydrateStateUsing(fn (?string $state): ?string => $state ? Str::trim($state) : $state);
         });
 
         TextInput::macro('generateSlug', function (string $slugField = 'slug') {

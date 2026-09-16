@@ -10,15 +10,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', static function (Blueprint $table) {
-            $table->after('id', static function (Blueprint $table) {
+        Schema::table('users', static function (Blueprint $table): void {
+            $table->after('id', static function (Blueprint $table): void {
                 $table->boolean('is_active')
                     ->default(0)
                     ->index();
                 $table->string('type')
                     ->nullable();
             });
-            $table->after('remember_token', static function (Blueprint $table) {
+            $table->after('remember_token', static function (Blueprint $table): void {
                 $table->string('api_token', 80)
                     ->unique()
                     ->nullable();

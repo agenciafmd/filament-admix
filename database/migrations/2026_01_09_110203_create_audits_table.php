@@ -14,7 +14,7 @@ return new class extends Migration
         $table = config('audit.drivers.database.table', 'audits');
 
         Schema::connection($connection)
-            ->create($table, function (Blueprint $table) {
+            ->create($table, function (Blueprint $table): void {
 
                 $morphPrefix = config('audit.user.morph_prefix', 'user');
 

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
+#[Description('Remove notification more than x days')]
+#[Signature('notifications:clear
+        {days? : How many days you want to keep the notifications.}')]
 final class NotificationsClear extends Command
 {
-    protected $signature = 'notifications:clear
-        {days? : How many days you want to keep the notifications.}';
-
-    protected $description = 'Remove notification more than x days';
-
     public function handle(): void
     {
         if (! $days = $this->argument('days')) {

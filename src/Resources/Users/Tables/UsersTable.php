@@ -54,9 +54,6 @@ final class UsersTable
                     RestoreBulkAction::make(),
                 ]),
             ])
-            ->defaultSort(function (Builder $query): Builder {
-                return $query->orderBy('is_active', 'desc')
-                    ->orderBy('name');
-            });
+            ->defaultSort(fn (Builder $query): Builder => $query->sort());
     }
 }

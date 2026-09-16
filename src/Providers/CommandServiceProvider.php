@@ -26,14 +26,14 @@ final class CommandServiceProvider extends ServiceProvider
             NotificationsClear::class,
         ]);
 
-        $this->app->booted(function () {
+        $this->app->booted(function (): void {
             $schedule = $this->app->make(Schedule::class);
             $minutes = config('filament-admix.schedule.minutes');
 
             $schedule->command('auth:clear-resets')
                 ->everyFifteenMinutes();
             $schedule->command('clockwork:clean')
-                ->before(function () {
+                ->before(function (): void {
                     if (config('clockwork.storage') !== 'files') {
                         return;
                     }

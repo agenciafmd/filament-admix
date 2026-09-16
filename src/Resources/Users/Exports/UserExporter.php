@@ -22,11 +22,9 @@ final class UserExporter extends Exporter
                 ->label(__('fields.id')),
             ExportColumn::make('is_active')
                 ->label(__('fields.is_active'))
-                ->formatStateUsing(function (string $state): string {
-                    return match ($state) {
-                        '1' => __('Yes'),
-                        '' => __('No'),
-                    };
+                ->formatStateUsing(fn (string $state): string => match ($state) {
+                    '1' => __('Yes'),
+                    '' => __('No'),
                 }),
             ExportColumn::make('name')
                 ->label(__('fields.name')),

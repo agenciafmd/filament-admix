@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Agenciafmd\Articles\ArticlesPlugin;
 use Filament\Support\Colors\Color;
 
 return [

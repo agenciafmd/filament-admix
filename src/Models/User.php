@@ -6,10 +6,12 @@ namespace Agenciafmd\Admix\Models;
 
 use Agenciafmd\Admix\Database\Factories\UserFactory;
 use Agenciafmd\Admix\Models\Scopes\AdmixTypeScope;
+use Agenciafmd\Admix\Traits\WithScopes;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,19 +26,28 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 #[ScopedBy([AdmixTypeScope::class])]
 #[UseFactory(UserFactory::class)]
+#[Hidden([
+    'api_token',
+    'password',
+    'remember_token',
+    'type',
+])]
 final class User extends Authenticatable implements AuditableContract, FilamentUser, HasAvatar, MustVerifyEmail
 {
-    use Auditable, HasFactory, Notifiable, Prunable, SoftDeletes;
-
-    protected $hidden = [
-        'api_token',
-        'password',
-        'remember_token',
-        'type',
-    ];
+    use Auditable;
+    use HasFactory;
+    use Notifiable;
+    use Prunable;
+    use SoftDeletes;
+    use WithScopes;
 
     protected $attributes = [
         'type' => 'admix',
+    ];
+
+    protected array $defaultSort = [
+        'is_active' => 'desc',
+        'name' => 'asc',
     ];
 
     public function getFilamentAvatarUrl(): ?string
