@@ -94,7 +94,7 @@ o closure manual de `afterStateUpdated`
 - star
 
 @boostsnippet('Example content of star field', 'php')
-    Toggle::make('is_active') ->translateLabel() ->default(false),
+    Toggle::make('star') ->translateLabel() ->default(false),
 @endboostsnippet
 
 - published_at
