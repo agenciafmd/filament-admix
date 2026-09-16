@@ -76,8 +76,8 @@ final class FilamentPanelProvider extends PanelProvider
                 for: 'Agenciafmd\Admix\Resources',
             )
             ->plugins(collect(config('filament-admix.plugins', []))
-                ->map(fn ($plugin): object => new $plugin())
-                ->toArray())
+                ->map(fn (string $plugin): object => new $plugin())
+                ->all())
             ->pages([
                 Dashboard::class,
             ])
