@@ -13,8 +13,8 @@ os campos principais do recurso, o segundo contém a seção "Informações" (__
 
 @boostsnippet('Example content of ArticleForm', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Resources\Articles\Schemas; use
-    Agenciafmd\Admix\Resources\Forms\Components\ImageUploadMultipleWithDefault; use
-    Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithDefault; use
+    Agenciafmd\Admix\Resources\Forms\Components\ImageUploadMultipleWithAutomaticallyResize; use
+    Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize; use
     Agenciafmd\Admix\Resources\Forms\Components\RichEditorWithDefault; use
     Agenciafmd\Admix\Resources\Forms\Components\YouTubeInput; use
     Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry; use Agenciafmd\Articles\Services\ArticleService; use
@@ -27,9 +27,9 @@ os campos principais do recurso, o segundo contém a seção "Informações" (__
     ->minLength(3) ->maxLength(255) ->required(), TextInput::make('slug') ->translateLabel() ->unique() ->required(),
     Textarea::make('summary') ->translateLabel() ->required() ->rows(5) ->columnSpanFull(),
     RichEditorWithDefault::make(name: 'content', directory: 'article/content') ->translateLabel() ->required()
-    ->columnSpanFull(), YouTubeInput::make(), ImageUploadWithDefault::make(name: 'image', directory: 'article/image',
-    fileNameField: 'title'), ImageUploadMultipleWithDefault::make(name: 'images', directory: 'article/images',
-    fileNameField: 'title'), TagsInput::make('tags') ->translateLabel() ->suggestions(fn (): array =>
+    ->columnSpanFull(), YouTubeInput::make(), ImageUploadWithAutomaticallyResize::make(name: 'image', directory:
+    'article/image', fileNameField: 'title'), ImageUploadMultipleWithAutomaticallyResize::make(name: 'images',
+    directory: 'article/images', fileNameField: 'title'), TagsInput::make('tags') ->translateLabel() ->suggestions(fn (): array =>
     ArticleService::make() ->tags() ->toArray()) ->columnSpanFull(), ]) ->collapsible() ->columns() ->columnSpan(2), ])
     ->columnSpan(2), Group::make([ Section::make(__('Information')) ->schema([ Toggle::make('is_active')
     ->translateLabel() ->default(true), Toggle::make('star') ->translateLabel() ->default(false),
@@ -75,14 +75,14 @@ o closure manual de `afterStateUpdated`
 `fileNameField`, utilize o campo `title` ou `name`, conforme o caso
 
 @boostsnippet('Example content of image field', 'php')
-    ImageUploadWithDefault::make(name: 'image', directory: 'article/image', fileNameField: 'title'),
+    ImageUploadWithAutomaticallyResize::make(name: 'image', directory: 'article/image', fileNameField: 'title'),
 @endboostsnippet
 
 - images no valor do campo `directory`, utilize o formato `{recurso}/{campo}`, ex: `article/images` no valor do campo
 `fileNameField`, utilize o campo `title` ou `name`, conforme o caso
 
 @boostsnippet('Example content of images field', 'php')
-    ImageUploadMultipleWithDefault::make(name: 'images', directory: 'article/images', fileNameField: 'title'),
+    ImageUploadMultipleWithAutomaticallyResize::make(name: 'images', directory: 'article/images', fileNameField: 'title'),
 @endboostsnippet
 
 - is_active
