@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Schemas;
 
-use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithDefault;
+use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize;
 use Agenciafmd\Admix\Resources\Forms\Components\PasswordInput;
 use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
 use Filament\Forms\Components\TextInput;
@@ -56,7 +56,7 @@ final class UserForm
                                         ->translateLabel()
                                         ->default(true)
                                         ->columnSpanFull(),
-                                    ImageUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
+                                    ImageUploadWithAutomaticallyResize::make(name: 'avatar', directory: 'user/avatar')
                                         ->avatar()
                                         ->alignCenter(),
                                     DateTimeEntry::make('created_at'),

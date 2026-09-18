@@ -6,8 +6,12 @@ namespace Agenciafmd\Admix\Resources\Forms\Components;
 
 use Filament\Forms\Components\FileUpload;
 
+/**
+ * @deprecated Use {@see ImageUploadWithAutomaticallyResize} instead.
+ */
 final class ImageUploadWithDefault
 {
+    #[\Deprecated(message: 'use ImageUploadWithAutomaticallyResize::make() instead')]
     public static function make(
         string $name,
         string $directory,

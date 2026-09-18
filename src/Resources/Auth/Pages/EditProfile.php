@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Auth\Pages;
 
-use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithDefault;
+use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize;
 use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\TextInput;
@@ -38,7 +38,7 @@ final class EditProfile extends BaseEditProfile
                             ->required(),
                         $this->getPasswordFormComponent(),
                         $this->getPasswordConfirmationFormComponent(),
-                        ImageUploadWithDefault::make(name: 'avatar', directory: 'user/avatar')
+                        ImageUploadWithAutomaticallyResize::make(name: 'avatar', directory: 'user/avatar')
                             ->avatar()
                             ->columnSpanFull(),
                     ])
