@@ -28,8 +28,8 @@ os campos principais do recurso, o segundo contém a seção "Informações" (__
     Textarea::make('summary') ->translateLabel() ->required() ->rows(5) ->columnSpanFull(),
     RichEditorWithDefault::make(name: 'content', directory: 'article/content') ->translateLabel() ->required()
     ->columnSpanFull(), YouTubeInput::make(), ImageUploadWithAutomaticallyResize::make(name: 'image', directory:
-    'article/image', fileNameField: 'title'), ImageUploadMultipleWithAutomaticallyResize::make(name: 'images',
-    directory: 'article/images', fileNameField: 'title'), TagsInput::make('tags') ->translateLabel() ->suggestions(fn (): array =>
+    'article/image'), ImageUploadMultipleWithAutomaticallyResize::make(name: 'images',
+    directory: 'article/images'), TagsInput::make('tags') ->translateLabel() ->suggestions(fn (): array =>
     ArticleService::make() ->tags() ->toArray()) ->columnSpanFull(), ]) ->collapsible() ->columns() ->columnSpan(2), ])
     ->columnSpan(2), Group::make([ Section::make(__('Information')) ->schema([ Toggle::make('is_active')
     ->translateLabel() ->default(true), Toggle::make('star') ->translateLabel() ->default(false),

@@ -8,10 +8,9 @@ metadata:
 
 # Componentes reutilizáveis do Admix Antes de criar um novo componente de formulário, verifique se já existe um
 equivalente no pacote `filament-admix`. Evite reimplementar upload de arquivo/vídeo, seletor de ícone, campo de senha,
-etc. | componente | namespace | descrição | |------------+-----------+-----------| | ImageUploadWithDefault |
-Agenciafmd\Admix\Resources\Forms\Components | upload de imagem única, com editor de imagem | |
-ImageUploadMultipleWithDefault | Agenciafmd\Admix\Resources\Forms\Components | upload de múltiplas imagens, com editor
-de imagem | | FileUploadWithDefault | Agenciafmd\Admix\Resources\Forms\Components | upload de arquivo genérico, com nome
+etc. | componente | namespace | descrição | |------------+-----------+-----------| | ImageUploadWithAutomaticallyResize |
+Agenciafmd\Admix\Resources\Forms\Components | upload de imagem única, com redimensionamento automático de imagem | |
+ImageUploadMultipleWithAutomaticallyResize | Agenciafmd\Admix\Resources\Forms\Components | upload de múltiplas imagens, com redimensionamento automático de imagem | | FileUploadWithDefault | Agenciafmd\Admix\Resources\Forms\Components | upload de arquivo genérico, com nome
 de arquivo derivado de outro campo | | VideoUploadWithDefault | Agenciafmd\Admix\Resources\Forms\Components | upload de
 vídeo (mp4), baseado em FileUploadWithDefault | | RichEditorWithDefault | Agenciafmd\Admix\Resources\Forms\Components |
 editor de texto rico (rich editor) com configuração padrão do pacote | | YouTubeInput |
