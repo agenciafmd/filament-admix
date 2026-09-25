@@ -7,6 +7,7 @@ A ideia principal é facilitar os CRUDS dos recursos mais comuns em aplicações
 
 - Usuários: cria usuários para acesso ao painel administrativo (admix).
 - Auditoria: registra ações realizadas no sistema, permitindo a restauração dos dados.
+- Grupos: controle de permissões automático por Resource (usuário sem grupo é administrador); nenhum pacote precisa de Policy ou config para isso.
 
 ### Estrutura para criação de novos recursos / pacotes
 
@@ -58,4 +59,5 @@ O conteúdo detalhado de cada arquivo (exemplos de código, tabelas de campos) e
 - `creating-filament-admix-package` — scaffold completo de um pacote novo (config, factory, migration, seeder, lang, Model, ServiceProviders, Pages, Resource, Service, Plugin)
 - `filament-admix-form-fields` — Schema/Form do Resource (layout, campos, macro `generateSlug()`)
 - `filament-admix-table-conventions` — Table do Resource (columns, filters, actions, defaultSort)
+- `filament-admix-permissions` — Grupos e permissões (`role_id`, `ResourcePolicy`, `PermissionRegistry`, `getExtraPermissions()` para actions próprias, testes com usuário restrito)
 - `filament-admix-components` — catálogo de componentes e traits reutilizáveis do Admix (verificar antes de criar um componente novo)

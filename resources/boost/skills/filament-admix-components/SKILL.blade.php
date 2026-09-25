@@ -23,4 +23,8 @@ Agenciafmd\Admix\Resources\Infolists\Components | exibição (infolist) de data/
 no formulário | Traits e concerns reutilizáveis: | trait/concern | namespace | descrição |
 |------------+-----------+-----------| | RedirectBack | Agenciafmd\Admix\Resources\Concerns | usado nas Pages de
 Create/Edit para retornar à listagem após salvar | | WithScopes | Agenciafmd\Admix\Traits | fornece os scopes `isActive`
-e `sort` para o Model; leia `$defaultSort` em vez de reimplementar ordenação |
+e `sort` para o Model; leia `$defaultSort` em vez de reimplementar ordenação | | PermissionRegistry |
+Agenciafmd\Admix\Permissions | lista as permissões dos Resources do painel e monta as chaves `{ResourceClass}@{ability}`
+(`permissionKey()`, `permissionFor()`); não reimplemente listas de permissões | | ResourcePolicy |
+Agenciafmd\Admix\Policies | policy genérica registrada automaticamente para os models dos Resources; não crie Policy por
+model (veja a skill `filament-admix-permissions`) |

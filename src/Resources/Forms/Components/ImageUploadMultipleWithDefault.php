@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Forms\Components;
 
+use Deprecated;
 use Filament\Forms\Components\FileUpload;
 
 /**
@@ -11,7 +12,7 @@ use Filament\Forms\Components\FileUpload;
  */
 final class ImageUploadMultipleWithDefault
 {
-    #[\Deprecated(message: 'use ImageUploadMultipleWithAutomaticallyResize::make() instead')]
+    #[Deprecated(message: 'use ImageUploadMultipleWithAutomaticallyResize::make() instead')]
     public static function make(
         string $name,
         string $directory,

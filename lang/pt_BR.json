@@ -23,5 +23,16 @@
     "Sort": "Ordenação",
     "Disable reordering": "Salvar",
     "Enable reordering": "Reordenar",
-    "This is a staging environment and the information entered will not be reflected in the production environment.": "Este é o <strong>ambiente de homologação</strong> e as informações inseridas não serão refletidas no ambiente de produção."
+    "This is a staging environment and the information entered will not be reflected in the production environment.": "Este é o <strong>ambiente de homologação</strong> e as informações inseridas não serão refletidas no ambiente de produção.",
+    "Role": "Grupo",
+    "Roles": "Grupos",
+    "Permissions": "Permissões",
+    "Administrator": "Administrador",
+    "Users without a role are administrators and have full access.": "Usuários sem grupo são administradores e têm acesso total.",
+    "view": "visualizar",
+    "create": "criar",
+    "update": "atualizar",
+    "delete": "deletar",
+    "restore": "restaurar",
+    "audit": "auditoria"
 }

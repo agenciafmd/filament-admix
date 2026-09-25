@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Prunable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -66,6 +67,31 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
             $this->hasVerifiedEmail()*/ ;
     }
 
+    /**
+     * @return BelongsTo<Role, $this>
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Users without a role are administrators and have every permission.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role_id === null;
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->role?->hasPermission($permission) ?? false;
+    }
+
     public function prunable(): Builder
     {
         return self::query()
@@ -76,6 +102,7 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
     {
         return [
             'is_active' => 'boolean',
+            'role_id' => 'integer',
             'password' => 'hashed',
             'email_verified_at' => 'datetime',
         ];

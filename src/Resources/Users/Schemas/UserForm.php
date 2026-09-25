@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Schemas;
 
+use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize;
 use Agenciafmd\Admix\Resources\Forms\Components\PasswordInput;
 use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\Page;
@@ -43,6 +45,15 @@ final class UserForm
                                         ->required(),
                                     PasswordInput::make()
                                         ->columnSpan(1),
+                                    Select::make('role_id')
+                                        ->label(__('Role'))
+                                        ->relationship('role', 'name')
+                                        ->placeholder(__('Administrator'))
+                                        ->selectablePlaceholder(fn (): bool => self::authenticatedUser()->isAdmin())
+                                        ->required(fn (): bool => ! self::authenticatedUser()->isAdmin())
+                                        ->disabled(fn (?User $record): bool => self::authenticatedUser()->is($record))
+//                                        ->helperText(__('Users without a role are administrators and have full access.'))
+                                        ->preload(),
                                 ])
                                 ->collapsible()
                                 ->columns()
@@ -56,7 +67,12 @@ final class UserForm
                                         ->translateLabel()
                                         ->default(true)
                                         ->columnSpanFull(),
-                                    ImageUploadWithAutomaticallyResize::make(name: 'avatar', directory: 'user/avatar')
+                                    ImageUploadWithAutomaticallyResize::make(
+                                        name: 'avatar',
+                                        directory: 'user/avatar',
+                                        width: '500',
+                                        height: '500',
+                                    )
                                         ->avatar()
                                         ->alignCenter(),
                                     DateTimeEntry::make('created_at'),
@@ -68,5 +84,11 @@ final class UserForm
                     ])
                     ->columnSpanFull(),
             ]);
+    }
+
+    private static function authenticatedUser(): User
+    {
+        /** @var User */
+        return auth()->user();
     }
 }

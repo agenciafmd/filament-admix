@@ -2,26 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Agenciafmd\Admix\Resources\Users\Tables;
+namespace Agenciafmd\Admix\Resources\Roles\Tables;
 
-use Agenciafmd\Admix\Models\User;
-// use Agenciafmd\Admix\Resources\Users\Exports\UserExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-// use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Gate;
 
-final class UsersTable
+final class RolesTable
 {
     public static function configure(Table $table): Table
     {
@@ -29,27 +24,15 @@ final class UsersTable
             ->columns([
                 TextColumn::make('name')
                     ->translateLabel()
+                    ->sortable()
                     ->searchable(),
-                TextColumn::make('email')
-                    ->translateLabel()
-                    ->searchable(),
-                TextColumn::make('role.name')
-                    ->label(__('Role'))
-                    ->placeholder(__('Administrator'))
-                    ->sortable(),
                 ToggleColumn::make('is_active')
                     ->translateLabel()
-                    ->disabled(fn (User $record): bool => auth()
-                        ->user()
-                        ->is($record) || Gate::denies('update', $record)),
+                    ->sortable(),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
                     ->translateLabel(),
-                SelectFilter::make('role_id')
-                    ->label(__('Role'))
-                    ->relationship('role', 'name')
-                    ->preload(),
                 TrashedFilter::make(),
             ])
             ->recordActions([
@@ -57,8 +40,6 @@ final class UsersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    //                    ExportBulkAction::make()
-                    //                        ->exporter(UserExporter::class),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

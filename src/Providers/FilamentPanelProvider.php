@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Providers;
 
+use Agenciafmd\Admix\Models\User;
+use Agenciafmd\Admix\Permissions\PermissionRegistry;
+use Agenciafmd\Admix\Policies\ResourcePolicy;
 use Agenciafmd\Admix\Resources\Auth\Pages\EditProfile;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -22,20 +25,27 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Operation;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentView;
+use Filament\Tables\Columns\CheckboxColumn;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\TextInputColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Override;
 
 final class FilamentPanelProvider extends PanelProvider
 {
@@ -45,6 +55,15 @@ final class FilamentPanelProvider extends PanelProvider
         $this->bootDefaultSectionConfigs();
         $this->bootDefaultFormComponents();
         $this->bootStagingAlert();
+        $this->bootPermissions();
+    }
+
+    #[Override]
+    public function register(): void
+    {
+        parent::register();
+
+        $this->app->singleton(PermissionRegistry::class);
     }
 
     public function panel(Panel $panel): Panel
@@ -118,6 +137,16 @@ final class FilamentPanelProvider extends PanelProvider
                 ->defaultPaginationPageOption(100);
         });
 
+        /**
+         * Inline editable columns bypass policies, so they are disabled
+         * when the user cannot update the record.
+         */
+        foreach ([CheckboxColumn::class, SelectColumn::class, TextInputColumn::class, ToggleColumn::class] as $editableColumn) {
+            $editableColumn::configureUsing(static function (CheckboxColumn|SelectColumn|TextInputColumn|ToggleColumn $column): void {
+                $column->disabled(fn (Model $record): bool => Gate::denies('update', $record));
+            });
+        }
+
         TextColumn::macro('limitWithTooltip', function (int $limit) {
             /** @var TextColumn $this */
             return $this->limit($limit)
@@ -173,6 +202,37 @@ final class FilamentPanelProvider extends PanelProvider
                         ->slug()
                         ->toString());
                 });
+        });
+    }
+
+    /**
+     * Registers the generic policy for every resource model without its own policy,
+     * and checks the extra abilities declared by resources (`getExtraPermissions()`).
+     */
+    private function bootPermissions(): void
+    {
+        $registry = resolve(PermissionRegistry::class);
+
+        foreach (array_keys($registry->resourcesByModel()) as $model) {
+            if (Gate::getPolicyFor($model) === null) {
+                Gate::policy($model, ResourcePolicy::class);
+            }
+        }
+
+        Gate::before(static function (mixed $user, string $ability, array $arguments) use ($registry): ?bool {
+            $model = $arguments[0] ?? null;
+
+            if (! $user instanceof User || ! ($model instanceof Model || is_string($model))) {
+                return null;
+            }
+
+            $resource = $registry->resourceFor($model);
+
+            if ($resource === null || ! array_key_exists($ability, $registry->extraAbilitiesFor($resource))) {
+                return null;
+            }
+
+            return $user->hasPermission(PermissionRegistry::permissionKey($resource, $ability));
         });
     }
 

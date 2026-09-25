@@ -12,6 +12,10 @@ quando disponíveis, são: is_active, star, tags e published_at na ação padrã
 `sort` da trait `WithScopes` (`$query->sort()`) — ele já ordena pelos campos definidos em `$defaultSort` no Model (veja
 a skill `creating-filament-admix-package`) o `BulkActionGroup`, deve conter `DeleteBulkAction::make()`,
 `ForceDeleteBulkAction::make()` e `RestoreBulkAction::make()`
+as actions padrão (Edit, Delete, ForceDelete, Restore) e as colunas editáveis (ToggleColumn etc.) já respeitam as
+permissões do Grupo do usuário; uma action própria (`Action::make('send')`) precisa de `->authorize('send')` e da
+ability declarada em `getExtraPermissions()` no Resource — veja a skill `filament-admix-permissions`. Ao chamar
+`->disabled()` numa coluna editável, inclua `Gate::denies('update', $record)` na condição, pois ela sobrescreve o padrão
 
 @boostsnippet('Example content of ArticlesTable', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Resources\Articles\Tables; use
