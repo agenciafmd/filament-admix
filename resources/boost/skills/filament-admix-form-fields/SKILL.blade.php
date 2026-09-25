@@ -28,13 +28,13 @@ os campos principais do recurso, o segundo contém a seção "Informações" (__
     Textarea::make('summary') ->translateLabel() ->required() ->rows(5) ->columnSpanFull(),
     RichEditorWithDefault::make(name: 'content', directory: 'article/content') ->translateLabel() ->required()
     ->columnSpanFull(), YouTubeInput::make(), ImageUploadWithAutomaticallyResize::make(name: 'image', directory:
-    'article/image'), ImageUploadMultipleWithAutomaticallyResize::make(name: 'images',
-    directory: 'article/images'), TagsInput::make('tags') ->translateLabel() ->suggestions(fn (): array =>
-    ArticleService::make() ->tags() ->toArray()) ->columnSpanFull(), ]) ->collapsible() ->columns() ->columnSpan(2), ])
-    ->columnSpan(2), Group::make([ Section::make(__('Information')) ->schema([ Toggle::make('is_active')
-    ->translateLabel() ->default(true), Toggle::make('star') ->translateLabel() ->default(false),
-    DateTimePicker::make('published_at') ->translateLabel() ->columnSpanFull(), DateTimeEntry::make('created_at'),
-    DateTimeEntry::make('updated_at'), ]) ->collapsible() ->columns(), ]), ]) ->columnSpanFull(), ]); } }
+    'article/image'), ImageUploadMultipleWithAutomaticallyResize::make(name: 'images', directory: 'article/images'),
+    TagsInput::make('tags') ->translateLabel() ->suggestions(fn (): array => ArticleService::make() ->tags()
+    ->toArray()) ->columnSpanFull(), ]) ->collapsible() ->columns() ->columnSpan(2), ]) ->columnSpan(2), Group::make([
+    Section::make(__('Information')) ->schema([ Toggle::make('is_active') ->translateLabel() ->default(true),
+    Toggle::make('star') ->translateLabel() ->default(false), DateTimePicker::make('published_at') ->translateLabel()
+    ->columnSpanFull(), DateTimeEntry::make('created_at'), DateTimeEntry::make('updated_at'), ]) ->collapsible()
+    ->columns(), ]), ]) ->columnSpanFull(), ]); } }
 @endboostsnippet
 
 utilize a relação de valores abaixo para os campos do formulário, caso sejam solicitados. - title ou name - utilize o
@@ -82,7 +82,8 @@ o closure manual de `afterStateUpdated`
 `fileNameField`, utilize o campo `title` ou `name`, conforme o caso
 
 @boostsnippet('Example content of images field', 'php')
-    ImageUploadMultipleWithAutomaticallyResize::make(name: 'images', directory: 'article/images', fileNameField: 'title'),
+    ImageUploadMultipleWithAutomaticallyResize::make(name: 'images', directory: 'article/images', fileNameField:
+    'title'),
 @endboostsnippet
 
 - is_active

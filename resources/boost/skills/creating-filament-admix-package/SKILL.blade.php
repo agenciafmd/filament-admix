@@ -157,11 +157,10 @@ do config do pacote, permitindo reordenar/reagrupar o menu sem alterar código `
 montar o conteúdo delas `getRelations()` lista os RelationManagers do recurso, sempre com o
 `AuditsRelationManager::class` por último; os RelationManagers próprios do pacote ficam em
 /src/Resources/Articles/RelationManagers/ e as convenções deles (nome, localização entre pacotes, modo só leitura) estão
-na skill `filament-admix-table-conventions`
-não crie Policy nem AuthServiceProvider: o admix registra a `ResourcePolicy` automaticamente e as permissões do
-Resource (visualizar, criar, atualizar, deletar, restaurar, auditoria) aparecem no formulário de Grupos; se o Resource
-tiver actions próprias (enviar, aprovar...), declare-as em `getExtraPermissions()` e proteja a action com
-`->authorize()` — veja a skill `filament-admix-permissions`
+na skill `filament-admix-table-conventions` não crie Policy nem AuthServiceProvider: o admix registra a `ResourcePolicy`
+automaticamente e as permissões do Resource (visualizar, criar, atualizar, deletar, restaurar, auditoria) aparecem no
+formulário de Grupos; se o Resource tiver actions próprias (enviar, aprovar...), declare-as em `getExtraPermissions()` e
+proteja a action com `->authorize()` — veja a skill `filament-admix-permissions`
 
 @boostsnippet('Example content of ArticleResource', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Resources\Articles; use Agenciafmd\Articles\Models\Article;
