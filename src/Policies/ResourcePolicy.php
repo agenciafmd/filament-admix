@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * method is declared explicitly. The decision is taken in `before()`, which
  * receives the model (or model class) needed to resolve the resource.
  */
-final class ResourcePolicy
+final readonly class ResourcePolicy
 {
-    public function __construct(private readonly PermissionRegistry $registry) {}
+    public function __construct(private PermissionRegistry $registry) {}
 
     public function before(mixed $user, string $ability, Model|string|null $model = null): bool
     {

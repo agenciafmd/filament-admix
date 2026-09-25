@@ -222,7 +222,7 @@ final class FilamentPanelProvider extends PanelProvider
         Gate::before(static function (mixed $user, string $ability, array $arguments) use ($registry): ?bool {
             $model = $arguments[0] ?? null;
 
-            if (! $user instanceof User || ! ($model instanceof Model || is_string($model))) {
+            if (! $user instanceof User || ! $model instanceof Model && ! is_string($model)) {
                 return null;
             }
 

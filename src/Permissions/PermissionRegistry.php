@@ -133,14 +133,14 @@ final class PermissionRegistry
             ->values()
             ->sortBy(fn (string $resource): string => sprintf(
                 '%s|%05d|%s',
-                self::navigationGroupLabel($resource) ?? '',
+                $this->navigationGroupLabel($resource) ?? '',
                 $resource::getNavigationSort() ?? 99999,
                 $resource::getPluralModelLabel(),
             ))
             ->map(fn (string $resource): array => [
                 'resource' => $resource,
                 'label' => collect([
-                    self::navigationGroupLabel($resource),
+                    $this->navigationGroupLabel($resource),
                     $resource::getPluralModelLabel(),
                 ])
                     ->filter()
@@ -182,7 +182,7 @@ final class PermissionRegistry
     /**
      * @param  class-string<FilamentResource>  $resource
      */
-    private static function navigationGroupLabel(string $resource): ?string
+    private function navigationGroupLabel(string $resource): ?string
     {
         $group = $resource::getNavigationGroup();
 
