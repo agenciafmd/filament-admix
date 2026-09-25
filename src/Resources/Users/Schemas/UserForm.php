@@ -52,7 +52,7 @@ final class UserForm
                                         ->selectablePlaceholder(fn (): bool => self::authenticatedUser()->isAdmin())
                                         ->required(fn (): bool => ! self::authenticatedUser()->isAdmin())
                                         ->disabled(fn (?User $record): bool => self::authenticatedUser()->is($record))
-//                                        ->helperText(__('Users without a role are administrators and have full access.'))
+                                        ->native(false)
                                         ->preload(),
                                 ])
                                 ->collapsible()
