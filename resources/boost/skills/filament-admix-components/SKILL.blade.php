@@ -18,10 +18,10 @@ RichEditorWithDefault | Agenciafmd\Admix\Resources\Forms\Components | editor de 
 configuração padrão do pacote | | YouTubeInput | Agenciafmd\Admix\Resources\Forms\Components | campo de URL de vídeo do
 YouTube | | IconPickerWithDefault | Agenciafmd\Admix\Resources\Forms\Components | seletor de ícone
 (heroicons/tabler/frontend) | | PasswordInput | Agenciafmd\Admix\Resources\Forms\Components | campo de senha com regra
-de validação e `dehydrated` condicional | | PermissionMatrix |
-Agenciafmd\Admix\Resources\Forms\Components | matriz de permissões (linhas = Resources, colunas = abilities, coluna
-"Outros" para `getExtraPermissions()`), usada no formulário de Grupos no campo `permissions` | | DateTimePickerDisabled | Agenciafmd\Admix\Resources\Forms\Components | campo
-de data/hora desabilitado, oculto na criação (ex.: `created_at`/`updated_at` editáveis só na edição) | | DateTimeEntry |
+de validação e `dehydrated` condicional | | PermissionMatrix | Agenciafmd\Admix\Resources\Forms\Components | matriz de
+permissões (linhas = Resources, colunas = abilities, coluna "Outros" para `getExtraPermissions()`), usada no formulário
+de Grupos no campo `permissions` | | DateTimePickerDisabled | Agenciafmd\Admix\Resources\Forms\Components | campo de
+data/hora desabilitado, oculto na criação (ex.: `created_at`/`updated_at` editáveis só na edição) | | DateTimeEntry |
 Agenciafmd\Admix\Resources\Infolists\Components | exibição (infolist) de data/hora, usado em `created_at`/`updated_at`
 no formulário | Traits e concerns reutilizáveis: | trait/concern | namespace | descrição |
 |------------+-----------+-----------| | RedirectBack | Agenciafmd\Admix\Resources\Concerns | usado nas Pages de

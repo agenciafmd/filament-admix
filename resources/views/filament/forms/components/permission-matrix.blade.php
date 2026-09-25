@@ -59,7 +59,10 @@
                     @php
                         $rowPermissions = array_keys($group['permissions']);
                     @endphp
-                    <tr wire:key="{{ $getStatePath() }}.{{ $group['resource'] }}" class="hover:bg-gray-50 dark:hover:bg-white/5">
+                    <tr
+                        wire:key="{{ $getStatePath() }}.{{ $group['resource'] }}"
+                        class="hover:bg-gray-50 dark:hover:bg-white/5"
+                    >
                         <td class="px-3 py-2 align-middle">
                             <label class="inline-flex cursor-pointer items-center gap-2 text-gray-950 dark:text-white">
                                 <input

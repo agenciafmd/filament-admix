@@ -22,32 +22,27 @@ view | sempre | | create (criar) | create, replicate | sempre | | update (atuali
 delete (deletar) | delete, deleteAny, forceDelete, forceDeleteAny | sempre | | restore (restaurar) | restore, restoreAny
 | o Model usa `SoftDeletes` | | audit (auditoria) | gate `audit` (e `restoreAudit` junto com update) | o Resource tem
 `AuditsRelationManager` em `getRelations()` | O rótulo do grupo no formulário é `navigationGroup » pluralModelLabel` do
-Resource. Traduza os labels no `pt_BR.json` do pacote. O formulário de Grupos usa o campo `PermissionMatrix` (`Agenciafmd\Admix\Resources\Forms\Components`)
-no atributo `permissions`: uma linha por Resource, uma coluna por ability padrão e a coluna "Outros" com as abilities
-extras; ao salvar, chaves de Resources que não estão mais no painel são descartadas. ## Como funciona -
-`Agenciafmd\Admix\Permissions\PermissionRegistry` (singleton) lê `Filament::getPanel('admix')->getResources()` e monta a
-lista de permissões (`groups()`), o mapa model → resource e a chave de cada ability (`permissionFor()`) -
-`Agenciafmd\Admix\Policies\ResourcePolicy` é registrada no `FilamentPanelProvider::bootPermissions()` para o model de
-cada Resource **que ainda não tem policy**. A decisão acontece no `before()`; os métodos existem explicitamente porque o
-Filament só consulta a policy quando `method_exists()` — `__call` não funciona - um `Gate::before` global resolve as
-abilities extras (`getExtraPermissions()`) - colunas editáveis (`ToggleColumn`, `SelectColumn`, `TextInputColumn`,
-`CheckboxColumn`) ignoram policies no Filament; o admix as desabilita globalmente com `Gate::denies('update', $record)`.
-Se a tabela chamar `->disabled()` na coluna, isso sobrescreve o padrão — inclua a checagem de `update` na sua condição -
-somente administradores alteram/excluem administradores e deixam alguém sem grupo; ninguém troca o próprio grupo ##
-Permissões extras: `getExtraPermissions()` Quando o Resource tem uma action própria (enviar, aprovar, exportar...),
-declare a ability no Resource com o método estático `getExtraPermissions()`, que retorna `['ability' => 'label']`. A
-ability vira um checkbox a mais no grupo do Resource, com a chave `{ResourceClass}@{ability}`.
+Resource. Traduza os labels no `pt_BR.json` do pacote. O formulário de Grupos usa o campo `PermissionMatrix`
+(`Agenciafmd\Admix\Resources\Forms\Components`) no atributo `permissions`: uma linha por Resource, uma coluna por
+ability padrão e a coluna "Outros" com as abilities extras; ao salvar, chaves de Resources que não estão mais no painel
+são descartadas. ## Como funciona - `Agenciafmd\Admix\Permissions\PermissionRegistry` (singleton) lê
+`Filament::getPanel('admix')->getResources()` e monta a lista de permissões (`groups()`), o mapa model → resource e a
+chave de cada ability (`permissionFor()`) - `Agenciafmd\Admix\Policies\ResourcePolicy` é registrada no
+`FilamentPanelProvider::bootPermissions()` para o model de cada Resource **que ainda não tem policy**. A decisão
+acontece no `before()`; os métodos existem explicitamente porque o Filament só consulta a policy quando
+`method_exists()` — `__call` não funciona - um `Gate::before` global resolve as abilities extras
+(`getExtraPermissions()`) - colunas editáveis (`ToggleColumn`, `SelectColumn`, `TextInputColumn`, `CheckboxColumn`)
+ignoram policies no Filament; o admix as desabilita globalmente com `Gate::denies('update', $record)`. Se a tabela
+chamar `->disabled()` na coluna, isso sobrescreve o padrão — inclua a checagem de `update` na sua condição - somente
+administradores alteram/excluem administradores e deixam alguém sem grupo; ninguém troca o próprio grupo ## Permissões
+extras: `getExtraPermissions()` Quando o Resource tem uma action própria (enviar, aprovar, exportar...), declare a
+ability no Resource com o método estático `getExtraPermissions()`, que retorna `['ability' => 'label']`. A ability vira
+um checkbox a mais no grupo do Resource, com a chave `{ResourceClass}@{ability}`.
 
 @boostsnippet('Example of getExtraPermissions in PostalResource', 'php')
-/**
- * @return array{send: string}
- */
-public static function getExtraPermissions(): array
-{
-    return [
-        'send' => __('send'),
-    ];
-}
+    /** *
+    @return
+    array{send: string} */ public static function getExtraPermissions(): array { return [ 'send' => __('send'), ]; }
 @endboostsnippet
 
 Na action, proteja com `->authorize('ability')` — o Filament checa a ability contra o record (ou o model, em header
