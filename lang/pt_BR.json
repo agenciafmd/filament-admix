@@ -34,5 +34,7 @@
     "update": "atualizar",
     "delete": "deletar",
     "restore": "restaurar",
-    "audit": "auditoria"
+    "audit": "auditoria",
+    "Resource": "Recurso",
+    "Others": "Outros"
 }

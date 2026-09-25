@@ -87,25 +87,42 @@ final class PermissionRegistry
      */
     public function abilitiesFor(string $resource): array
     {
-        $abilities = [
+        return [
+            ...$this->standardAbilitiesFor($resource),
+            ...$this->extraAbilitiesFor($resource),
+        ];
+    }
+
+    /**
+     * The standard abilities, in display order.
+     *
+     * @return array<string, string> ability => label
+     */
+    public function standardAbilities(): array
+    {
+        return [
             'view' => __('view'),
             'create' => __('create'),
             'update' => __('update'),
             'delete' => __('delete'),
+            'restore' => __('restore'),
+            'audit' => __('audit'),
         ];
+    }
 
-        if (in_array(SoftDeletes::class, class_uses_recursive($resource::getModel()), true)) {
-            $abilities['restore'] = __('restore');
-        }
-
-        if (in_array(AuditsRelationManager::class, $resource::getRelations(), true)) {
-            $abilities['audit'] = __('audit');
-        }
-
-        return [
-            ...$abilities,
-            ...$this->extraAbilitiesFor($resource),
-        ];
+    /**
+     * @param  class-string<FilamentResource>  $resource
+     * @return array<string, string> ability => label
+     */
+    public function standardAbilitiesFor(string $resource): array
+    {
+        return collect($this->standardAbilities())
+            ->filter(fn (string $label, string $ability): bool => match ($ability) {
+                'restore' => in_array(SoftDeletes::class, class_uses_recursive($resource::getModel()), true),
+                'audit' => in_array(AuditsRelationManager::class, $resource::getRelations(), true),
+                default => true,
+            })
+            ->all();
     }
 
     /**
@@ -125,7 +142,7 @@ final class PermissionRegistry
     }
 
     /**
-     * @return array<int, array{resource: class-string<FilamentResource>, label: string, permissions: array<string, string>}>
+     * @return array<int, array{resource: class-string<FilamentResource>, label: string, permissions: array<string, string>, abilities: array<string, string>, extra: array<string, string>}>
      */
     public function groups(): array
     {
@@ -146,6 +163,16 @@ final class PermissionRegistry
                     ->filter()
                     ->implode(' » '),
                 'permissions' => collect($this->abilitiesFor($resource))
+                    ->mapWithKeys(fn (string $label, string $ability): array => [
+                        self::permissionKey($resource, $ability) => $label,
+                    ])
+                    ->all(),
+                'abilities' => collect($this->standardAbilitiesFor($resource))
+                    ->mapWithKeys(fn (string $label, string $ability): array => [
+                        $ability => self::permissionKey($resource, $ability),
+                    ])
+                    ->all(),
+                'extra' => collect($this->extraAbilitiesFor($resource))
                     ->mapWithKeys(fn (string $label, string $ability): array => [
                         self::permissionKey($resource, $ability) => $label,
                     ])

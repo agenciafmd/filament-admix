@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Roles\Schemas;
 
-use Agenciafmd\Admix\Models\Role;
-use Agenciafmd\Admix\Permissions\PermissionRegistry;
+use Agenciafmd\Admix\Resources\Forms\Components\PermissionMatrix;
 use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
@@ -17,8 +15,6 @@ use Filament\Schemas\Schema;
 
 final class RoleForm
 {
-    public const string PERMISSION_GROUPS = 'permission_groups';
-
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -53,51 +49,14 @@ final class RoleForm
                                 ->collapsible(),
                         ]),
                         Section::make(__('Permissions'))
-                            ->schema(self::permissionFields())
-                            ->columns(4)
+                            ->schema([
+                                PermissionMatrix::make('permissions')
+                                    ->hiddenLabel(),
+                            ])
                             ->collapsible()
                             ->columnSpanFull(),
                     ])
                     ->columnSpanFull(),
             ]);
-    }
-
-    /**
-     * Collapses the per-resource checkbox lists into the `permissions` column.
-     *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    public static function mergePermissions(array $data): array
-    {
-        $data['permissions'] = collect($data[self::PERMISSION_GROUPS] ?? [])
-            ->flatten()
-            ->filter()
-            ->unique()
-            ->values()
-            ->all();
-
-        unset($data[self::PERMISSION_GROUPS]);
-
-        return $data;
-    }
-
-    /**
-     * @return array<int, CheckboxList>
-     */
-    private static function permissionFields(): array
-    {
-        return collect(resolve(PermissionRegistry::class)->groups())
-            ->map(fn (array $group): CheckboxList => CheckboxList::make(self::PERMISSION_GROUPS . '.' . str($group['resource'])->replace('\\', '_'))
-                ->label($group['label'])
-                ->options($group['permissions'])
-                ->afterStateHydrated(function (CheckboxList $component, ?Role $record) use ($group): void {
-                    $component->state(array_values(array_intersect(
-                        array_keys($group['permissions']),
-                        $record?->permissions ?? [],
-                    )));
-                })
-                ->bulkToggleable())
-            ->all();
     }
 }

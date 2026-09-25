@@ -22,7 +22,9 @@ view | sempre | | create (criar) | create, replicate | sempre | | update (atuali
 delete (deletar) | delete, deleteAny, forceDelete, forceDeleteAny | sempre | | restore (restaurar) | restore, restoreAny
 | o Model usa `SoftDeletes` | | audit (auditoria) | gate `audit` (e `restoreAudit` junto com update) | o Resource tem
 `AuditsRelationManager` em `getRelations()` | O rótulo do grupo no formulário é `navigationGroup » pluralModelLabel` do
-Resource. Traduza os labels no `pt_BR.json` do pacote. ## Como funciona -
+Resource. Traduza os labels no `pt_BR.json` do pacote. O formulário de Grupos usa o campo `PermissionMatrix` (`Agenciafmd\Admix\Resources\Forms\Components`)
+no atributo `permissions`: uma linha por Resource, uma coluna por ability padrão e a coluna "Outros" com as abilities
+extras; ao salvar, chaves de Resources que não estão mais no painel são descartadas. ## Como funciona -
 `Agenciafmd\Admix\Permissions\PermissionRegistry` (singleton) lê `Filament::getPanel('admix')->getResources()` e monta a
 lista de permissões (`groups()`), o mapa model → resource e a chave de cada ability (`permissionFor()`) -
 `Agenciafmd\Admix\Policies\ResourcePolicy` é registrada no `FilamentPanelProvider::bootPermissions()` para o model de
@@ -37,10 +39,15 @@ declare a ability no Resource com o método estático `getExtraPermissions()`, q
 ability vira um checkbox a mais no grupo do Resource, com a chave `{ResourceClass}@{ability}`.
 
 @boostsnippet('Example of getExtraPermissions in PostalResource', 'php')
-    /** *
-    @return
-    array<string
-     , string> */ public static function getExtraPermissions(): array { return [ 'send' => __('send'), ]; }
+/**
+ * @return array{send: string}
+ */
+public static function getExtraPermissions(): array
+{
+    return [
+        'send' => __('send'),
+    ];
+}
 @endboostsnippet
 
 Na action, proteja com `->authorize('ability')` — o Filament checa a ability contra o record (ou o model, em header

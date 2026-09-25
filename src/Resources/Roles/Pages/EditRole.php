@@ -6,7 +6,6 @@ namespace Agenciafmd\Admix\Resources\Roles\Pages;
 
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
 use Agenciafmd\Admix\Resources\Roles\RoleResource;
-use Agenciafmd\Admix\Resources\Roles\Schemas\RoleForm;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -39,14 +38,5 @@ final class EditRole extends EditRecord
         return [
             DeleteAction::make(),
         ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        return RoleForm::mergePermissions($data);
     }
 }
