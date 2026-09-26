@@ -7,6 +7,7 @@ namespace Agenciafmd\Admix\Models;
 use Agenciafmd\Admix\Database\Factories\RoleFactory;
 use Agenciafmd\Admix\Traits\WithScopes;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -46,6 +47,15 @@ final class Role extends Model implements AuditableContract
     {
         return $this->is_active
             && in_array($permission, $this->permissions ?? [], true);
+    }
+
+    /**
+     * @return Builder<self>
+     */
+    public function prunable(): Builder
+    {
+        return self::query()
+            ->where('deleted_at', '<=', now()->subDays(30));
     }
 
     #[Override]
