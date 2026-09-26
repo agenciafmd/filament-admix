@@ -7,3 +7,7 @@ services:
         class: Agenciafmd\Admix\PHPStan\FilamentMacroMethodsExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: Agenciafmd\Admix\PHPStan\WithScopesBuilderMethodsExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension

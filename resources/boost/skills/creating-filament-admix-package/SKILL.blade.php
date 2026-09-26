@@ -84,8 +84,8 @@ meia-noite do dia
     extends Model implements AuditableContract { use Auditable; use HasFactory; use Prunable; use SoftDeletes; use
     WithScopes; protected array $defaultSort = [ 'is_active' => 'desc', 'star' => 'desc', 'published_at' => 'desc',
     'title' => 'asc', ]; public function prunable(): Builder { return self::query() ->where('deleted_at', '<=',
-    today()->subDays(30)); } #[Override] protected function casts(): array { return [ 'is_active' => 'boolean', 'star' =>
-    'boolean', 'tags' => 'array', 'images' => 'array', 'published_at' => 'timestamp', ]; } }
+    today()->subDays(30)); } #[Override] protected function casts(): array { return [ 'is_active' => 'boolean', 'star'
+    => 'boolean', 'tags' => 'array', 'images' => 'array', 'published_at' => 'timestamp', ]; } }
 @endboostsnippet
 
 utilize a relação de valores abaixo para os campos no casts, caso sejam solicitados. | campo | padrão |
