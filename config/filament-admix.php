@@ -6,7 +6,7 @@ use Filament\Support\Colors\Color;
 
 return [
     'schedule' => [
-        'minutes' => sprintf('%02d', abs(crc32(env('APP_NAME', 'FMD'))) % 60),
+        'minutes' => sprintf('%02d', abs(crc32((string) env('APP_NAME', 'FMD'))) % 60),
     ],
     'timestamp' => [
         'format' => env('ADMIX_TIMESTAMP_FORMAT', 'd/m/Y H:i:s'),

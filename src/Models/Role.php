@@ -19,10 +19,16 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 final class Role extends Model implements AuditableContract
 {
     use Auditable;
+
+    /** @use HasFactory<RoleFactory> */
     use HasFactory;
+
     use SoftDeletes;
     use WithScopes;
 
+    /**
+     * @var array<string, 'asc'|'desc'>
+     */
     protected array $defaultSort = [
         'is_active' => 'desc',
         'name' => 'asc',

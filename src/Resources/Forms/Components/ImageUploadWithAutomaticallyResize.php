@@ -19,7 +19,7 @@ final class ImageUploadWithAutomaticallyResize
         string $format = 'jpg',
         int $quality = 95,
     ): FileUpload {
-        return FileUploadWithDefault::make(
+        $upload = FileUploadWithDefault::make(
             name: $name,
             directory: $directory,
             fileNameField: $fileNameField,
@@ -31,12 +31,17 @@ final class ImageUploadWithAutomaticallyResize
             ->automaticallyResizeImagesToWidth($width)
             ->automaticallyResizeImagesToHeight($height)
             ->imageEditor(false)
-            ->afterLabel(static function (Get $get) use ($width, $height): string {
-                $resolvedWidth = $width instanceof Closure ? $width($get) : $width;
-                $resolvedHeight = $height instanceof Closure ? $height($get) : $height;
+            ->afterLabel(static fn (Get $get): string => 'Max. ' . self::resolveDimension($width, $get) . 'x' . self::resolveDimension($height, $get));
 
-                return "Max. {$resolvedWidth}x{$resolvedHeight}";
-            })
-            ->optimize(format: $format, quality: $quality);
+        $upload->optimize(format: $format, quality: $quality);
+
+        return $upload;
+    }
+
+    private static function resolveDimension(string|Closure $dimension, Get $get): string
+    {
+        $value = $dimension instanceof Closure ? $dimension($get) : $dimension;
+
+        return is_scalar($value) ? (string) $value : '';
     }
 }

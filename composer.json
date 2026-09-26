@@ -32,6 +32,11 @@
             "providers": [
                 "Agenciafmd\\Admix\\Providers\\AdmixServiceProvider"
             ]
+        },
+        "phpstan": {
+            "includes": [
+                "extension.neon"
+            ]
         }
     }
 }

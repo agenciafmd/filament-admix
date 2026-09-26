@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Pages;
 
+use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
 use Agenciafmd\Admix\Resources\Users\UserResource;
 use Filament\Actions\DeleteAction;
@@ -15,13 +16,18 @@ final class EditUser extends EditRecord
 
     protected static string $resource = UserResource::class;
 
+    /**
+     * @var array<int, string>
+     */
     protected $listeners = [
         'auditRestored',
     ];
 
     public function getRelationManagers(): array
     {
-        if ($this->record->trashed()) {
+        $record = $this->getRecord();
+
+        if ($record instanceof User && $record->trashed()) {
             return [];
         }
 

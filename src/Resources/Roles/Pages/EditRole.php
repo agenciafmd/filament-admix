@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Roles\Pages;
 
+use Agenciafmd\Admix\Models\Role;
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
 use Agenciafmd\Admix\Resources\Roles\RoleResource;
 use Filament\Actions\DeleteAction;
@@ -15,13 +16,18 @@ final class EditRole extends EditRecord
 
     protected static string $resource = RoleResource::class;
 
+    /**
+     * @var array<int, string>
+     */
     protected $listeners = [
         'auditRestored',
     ];
 
     public function getRelationManagers(): array
     {
-        if ($this->record->trashed()) {
+        $record = $this->getRecord();
+
+        if ($record instanceof Role && $record->trashed()) {
             return [];
         }
 

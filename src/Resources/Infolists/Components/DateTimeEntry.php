@@ -13,7 +13,7 @@ final class DateTimeEntry
     {
         return TextEntry::make($name)
             ->translateLabel()
-            ->date(config('filament-admix.timestamp.format'))
+            ->date(config()->string('filament-admix.timestamp.format', 'd/m/Y H:i:s'))
             ->hiddenOn(Operation::Create);
     }
 }

@@ -8,6 +8,7 @@ use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
 use Agenciafmd\Admix\Policies\ResourcePolicy;
 use Agenciafmd\Admix\Resources\Auth\Pages\EditProfile;
+use Filament\Contracts\Plugin;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -41,6 +42,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -79,13 +81,13 @@ final class FilamentPanelProvider extends PanelProvider
             ->profile()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->maxContentWidth(Width::Full)
-            ->font(config('filament-admix.font', 'Inter'))
-            ->colors(config('filament-admix.colors', [
+            ->font(config()->string('filament-admix.font', 'Inter'))
+            ->colors(fn (): mixed => config('filament-admix.colors', [
                 'primary' => Color::Blue,
             ]))
-            ->brandLogo(fn (): HtmlString => new HtmlString(file_get_contents(resource_path('filament/filament-admix/svg/logo.svg'))))
+            ->brandLogo(fn (): HtmlString => new HtmlString(File::get(resource_path('filament/filament-admix/svg/logo.svg'))))
             ->brandLogoHeight('2rem')
-            ->favicon(fn (): HtmlString => new HtmlString(file_get_contents(resource_path('filament/filament-admix/svg/favicon.svg'))))
+            ->favicon(fn (): HtmlString => new HtmlString(File::get(resource_path('filament/filament-admix/svg/favicon.svg'))))
             ->discoverPages(
                 in: __DIR__ . '/../Pages',
                 for: 'Agenciafmd\Admix\Pages',
@@ -94,8 +96,10 @@ final class FilamentPanelProvider extends PanelProvider
                 in: __DIR__ . '/../Resources',
                 for: 'Agenciafmd\Admix\Resources',
             )
-            ->plugins(collect(config('filament-admix.plugins', []))
-                ->map(fn (string $plugin): object => new $plugin())
+            ->plugins(collect(config()->array('filament-admix.plugins', []))
+                ->filter(static fn (mixed $plugin): bool => is_string($plugin) && class_exists($plugin))
+                ->map(static fn (string $plugin): ?Plugin => ($instance = new $plugin()) instanceof Plugin ? $instance : null)
+                ->filter()
                 ->all())
             ->pages([
                 Dashboard::class,
@@ -147,19 +151,22 @@ final class FilamentPanelProvider extends PanelProvider
             });
         }
 
-        TextColumn::macro('limitWithTooltip', function (int $limit) {
-            /** @var TextColumn $this */
-            return $this->limit($limit)
-                ->tooltip(function (TextColumn $column): ?string {
-                    $state = $column->getState();
+        TextColumn::macro('limitWithTooltip', fn (int $limit): TextColumn => $this->limit($limit)
+            ->tooltip(function (TextColumn $column): ?string {
+                $state = $column->getState();
 
-                    if (mb_strlen((string) $state) <= $column->getCharacterLimit()) {
-                        return null;
-                    }
+                if (! is_scalar($state)) {
+                    return null;
+                }
 
-                    return $state;
-                });
-        });
+                $text = (string) $state;
+
+                if (mb_strlen($text) <= $column->getCharacterLimit()) {
+                    return null;
+                }
+
+                return $text;
+            }));
     }
 
     private function bootDefaultSectionConfigs(): void
@@ -183,26 +190,23 @@ final class FilamentPanelProvider extends PanelProvider
             $textarea->dehydrateStateUsing(fn (?string $state): ?string => $state ? Str::trim($state) : $state);
         });
 
-        TextInput::macro('generateSlug', function (string $slugField = 'slug') {
-            /** @var TextInput $this */
-            return $this
-                ->live(onBlur: true)
-                ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state, string $operation) use ($slugField): void {
-                    if ($operation === Operation::Edit->value) {
-                        return;
-                    }
+        TextInput::macro('generateSlug', fn (string $slugField = 'slug'): TextInput => $this
+            ->live(onBlur: true)
+            ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state, string $operation) use ($slugField): void {
+                if ($operation === Operation::Edit->value) {
+                    return;
+                }
 
-                    if (($get($slugField) ?? '') !== str($old)
-                        ->slug()
-                        ->toString()) {
-                        return;
-                    }
+                if (($get($slugField) ?? '') !== str($old)
+                    ->slug()
+                    ->toString()) {
+                    return;
+                }
 
-                    $set($slugField, str($state)
-                        ->slug()
-                        ->toString());
-                });
-        });
+                $set($slugField, str($state)
+                    ->slug()
+                    ->toString());
+            }));
     }
 
     /**

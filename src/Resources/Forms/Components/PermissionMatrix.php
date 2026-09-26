@@ -27,12 +27,12 @@ final class PermissionMatrix extends Field
             $component->state(is_array($state) ? array_values($state) : []);
         });
 
-        $this->dehydrateStateUsing(fn (mixed $state): array => array_values(array_intersect(
-            is_array($state) ? $state : [],
-            collect($this->getGroups())
-                ->flatMap(fn (array $group): array => array_keys($group['permissions']))
-                ->all(),
-        )));
+        $this->dehydrateStateUsing(fn (mixed $state): array => collect(is_array($state) ? $state : [])
+            ->filter(static fn (mixed $permission): bool => is_string($permission))
+            ->intersect(collect($this->getGroups())
+                ->flatMap(static fn (array $group): array => array_keys($group['permissions'])))
+            ->values()
+            ->all());
     }
 
     /**
@@ -59,7 +59,7 @@ final class PermissionMatrix extends Field
         return collect($this->getAbilityColumns())
             ->map(fn (string $label, string $ability): array => collect($this->getGroups())
                 ->pluck("abilities.{$ability}")
-                ->filter()
+                ->filter(static fn (mixed $permission): bool => is_string($permission))
                 ->values()
                 ->all())
             ->all();

@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Override;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
@@ -36,7 +37,10 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 final class User extends Authenticatable implements AuditableContract, FilamentUser, HasAvatar, MustVerifyEmail
 {
     use Auditable;
+
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
+
     use Notifiable;
     use Prunable;
     use SoftDeletes;
@@ -46,6 +50,9 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
         'type' => 'admix',
     ];
 
+    /**
+     * @var array<string, 'asc'|'desc'>
+     */
     protected array $defaultSort = [
         'is_active' => 'desc',
         'name' => 'asc',
@@ -92,12 +99,16 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
         return $this->role?->hasPermission($permission) ?? false;
     }
 
+    /**
+     * @return Builder<self>
+     */
     public function prunable(): Builder
     {
         return self::query()
             ->where('deleted_at', '<=', now()->subDays(30));
     }
 
+    #[Override]
     protected function casts(): array
     {
         return [

@@ -9,26 +9,33 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait WithScopes
 {
+    /**
+     * @param  Builder<self>  $query
+     */
     #[Scope]
-    public static function isActive(Builder $query): void
+    protected function isActive(Builder $query): void
     {
         $query->where($query->qualifyColumn('is_active'), true);
     }
 
+    /**
+     * Ordena pelo `$defaultSort` do model.
+     *
+     * A coluna `sort` é ordenada de forma crescente, deixando os nulos por último.
+     *
+     * @param  Builder<self>  $query
+     */
     #[Scope]
     protected function sort(Builder $query): void
     {
-        $defaultSort = $this->defaultSort ?? [
-            'is_active' => 'desc',
-            'name' => 'asc',
-        ];
-
-        foreach ($defaultSort as $field => $direction) {
+        foreach ($this->defaultSort as $field => $direction) {
             if ($field === 'sort') {
-                $query->orderByRaw('-' . $query->qualifyColumn('sort') . ' DESC');
-            } else {
-                $query->orderBy($query->qualifyColumn($field), $direction);
+                $query->orderByRaw('-sort DESC');
+
+                continue;
             }
+
+            $query->orderBy($query->qualifyColumn($field), $direction === 'desc' ? 'desc' : 'asc');
         }
     }
 }

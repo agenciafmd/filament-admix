@@ -1,0 +1,9 @@
+parameters:
+    stubFiles:
+        - stubs/FilamentMacroable.stub
+
+services:
+    -
+        class: Agenciafmd\Admix\PHPStan\FilamentMacroMethodsExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension

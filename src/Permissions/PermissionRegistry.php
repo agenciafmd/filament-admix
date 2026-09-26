@@ -7,6 +7,7 @@ namespace Agenciafmd\Admix\Permissions;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource as FilamentResource;
 use Filament\Support\Contracts\HasLabel;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
@@ -62,13 +63,15 @@ final class PermissionRegistry
             return $this->resourcesByModel;
         }
 
-        $resourcesByModel = [];
+        $panel = Filament::getPanels()[$this->panelId] ?? null;
 
-        foreach (Filament::getPanels()[$this->panelId]?->getResources() ?? [] as $resource) {
-            $resourcesByModel[$resource::getModel()] ??= $resource;
-        }
+        $this->resourcesByModel = collect($panel?->getResources() ?? [])
+            ->filter(static fn (string $resource): bool => is_subclass_of($resource, FilamentResource::class))
+            ->unique(static fn (string $resource): string => $resource::getModel())
+            ->mapWithKeys(static fn (string $resource): array => [$resource::getModel() => $resource])
+            ->all();
 
-        return $this->resourcesByModel = $resourcesByModel;
+        return $this->resourcesByModel;
     }
 
     /**
@@ -138,7 +141,13 @@ final class PermissionRegistry
             return [];
         }
 
-        return $resource::getExtraPermissions();
+        $extraPermissions = $resource::getExtraPermissions();
+
+        return collect(is_array($extraPermissions) ? $extraPermissions : [])
+            ->mapWithKeys(static fn (mixed $label, int|string $ability): array => is_string($ability) && is_string($label)
+                ? [$ability => $label]
+                : [])
+            ->all();
     }
 
     /**
@@ -213,10 +222,16 @@ final class PermissionRegistry
     {
         $group = $resource::getNavigationGroup();
 
+        if ($group instanceof HasLabel) {
+            $label = $group->getLabel();
+
+            return $label instanceof Htmlable ? $label->toHtml() : $label;
+        }
+
         return match (true) {
-            $group instanceof HasLabel => (string) $group->getLabel(),
             $group instanceof UnitEnum => $group->name,
-            default => $group,
+            is_string($group) => $group,
+            default => null,
         };
     }
 }

@@ -14,17 +14,23 @@ use Illuminate\Support\Facades\DB;
         {days? : How many days you want to keep the notifications.}')]
 final class NotificationsClear extends Command
 {
-    public function handle(): void
+    public function handle(): int
     {
-        if (! $days = $this->argument('days')) {
-            $days = $this->ask('How many days do you want to keep the notifications?', '30');
+        $days = $this->argument('days') ?: $this->ask('How many days do you want to keep the notifications?', '30');
+
+        if (! is_numeric($days)) {
+            $this->components->error('The number of days must be numeric.');
+
+            return self::FAILURE;
         }
 
         DB::table('notifications')
             ->where('created_at', '<=', today()
-                ->subDays($days))
+                ->subDays((int) $days))
             ->delete();
 
         $this->info('Done!');
+
+        return self::SUCCESS;
     }
 }

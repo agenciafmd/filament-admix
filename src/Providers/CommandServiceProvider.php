@@ -28,17 +28,19 @@ final class CommandServiceProvider extends ServiceProvider
 
         $this->app->booted(function (): void {
             $schedule = $this->app->make(Schedule::class);
-            $minutes = config('filament-admix.schedule.minutes');
+            $minutes = config()->string('filament-admix.schedule.minutes', '00');
 
             $schedule->command('auth:clear-resets')
                 ->everyFifteenMinutes();
             $schedule->command('clockwork:clean')
                 ->before(function (): void {
-                    if (config('clockwork.storage') !== 'files') {
+                    $storagePath = config('clockwork.storage_files_path');
+
+                    if (config('clockwork.storage') !== 'files' || ! is_string($storagePath)) {
                         return;
                     }
 
-                    $path = config('clockwork.storage_files_path') . '/index';
+                    $path = $storagePath . '/index';
                     $content = '';
                     if (! File::exists($path)) {
                         File::ensureDirectoryExists(dirname($path));

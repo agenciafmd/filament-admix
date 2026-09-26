@@ -11,22 +11,26 @@ trait DefaultNotificationAndFileName
 {
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = __('Your :model export has completed and :count :rows exported.', [
-            'model' => str(__(str(self::$model)
+        $body = self::translate('Your :model export has completed and :count :rows exported.', [
+            'model' => str(self::translate(str(self::$model)
                 ->afterLast('\\')
                 ->plural()
                 ->ucfirst()
-                ->toString()))->lower(),
-            'count' => Number::format($export->successful_rows),
-            'rows' => __(str('row')
+                ->toString()))
+                ->lower()
+                ->toString(),
+            'count' => self::formatCount($export->successful_rows),
+            'rows' => self::translate(str('row')
                 ->plural($export->successful_rows)
                 ->toString()),
         ]);
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . __(':count :rows failed to export.', [
-                'count' => Number::format($failedRowsCount),
-                'rows' => __(str('row')->plural($failedRowsCount)),
+            $body .= ' ' . self::translate(':count :rows failed to export.', [
+                'count' => self::formatCount($failedRowsCount),
+                'rows' => self::translate(str('row')
+                    ->plural($failedRowsCount)
+                    ->toString()),
             ]);
         }
 
@@ -38,6 +42,21 @@ trait DefaultNotificationAndFileName
         return now()->format('YmdHis') . '-' . str(self::$model)
             ->afterLast('\\')
             ->lower()
-            ->plural() . '-' . $export->getKey();
+            ->plural() . '-' . $export->id;
+    }
+
+    /**
+     * @param  array<string, string>  $replace
+     */
+    private static function translate(string $key, array $replace = []): string
+    {
+        $translation = __($key, $replace);
+
+        return is_string($translation) ? $translation : $key;
+    }
+
+    private static function formatCount(int $count): string
+    {
+        return Number::format($count) ?: (string) $count;
     }
 }

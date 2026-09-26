@@ -39,9 +39,7 @@ final class UsersTable
                     ->sortable(),
                 ToggleColumn::make('is_active')
                     ->translateLabel()
-                    ->disabled(fn (User $record): bool => auth()
-                        ->user()
-                        ->is($record) || Gate::denies('update', $record)),
+                    ->disabled(fn (User $record): bool => $record->is(auth()->user()) || Gate::denies('update', $record)),
             ])
             ->filters([
                 TernaryFilter::make('is_active')

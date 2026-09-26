@@ -18,13 +18,12 @@ final class ImageUploadWithDefault
         string $directory,
         string $fileNameField = 'name',
     ): FileUpload {
-        return FileUploadWithDefault::make(
+        $upload = FileUploadWithDefault::make(
             name: $name,
             directory: $directory,
             fileNameField: $fileNameField,
         )
             ->image()
-            ->optimize(format: 'jpg', quality: 95)
             ->imageEditorAspectRatioOptions([
                 '21:9',
                 '16:9',
@@ -34,5 +33,9 @@ final class ImageUploadWithDefault
             ->imageEditorViewportWidth(1920)
             ->imageEditorViewportHeight(1080)
             ->imageEditor();
+
+        $upload->optimize(format: 'jpg', quality: 95);
+
+        return $upload;
     }
 }

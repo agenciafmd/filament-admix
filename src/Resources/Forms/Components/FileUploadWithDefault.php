@@ -21,12 +21,17 @@ final class FileUploadWithDefault
             ->translateLabel()
             ->directory("media/{$directory}")
             ->getUploadedFileNameForStorageUsing(
-                fn (TemporaryUploadedFile $file, Get $get): string => str($get($fileNameField))
+                fn (TemporaryUploadedFile $file, Get $get): string => str(self::fileName($get($fileNameField)))
                     ->trim()
                     ->append('-' . date('His') . '-' . random_int(100, 999))
                     ->slug() . '.' . str($file->getClientOriginalExtension())->lower(),
             )
             ->maxSize(1024 * 10)
             ->columnSpanFull();
+    }
+
+    private static function fileName(mixed $value): string
+    {
+        return is_scalar($value) ? (string) $value : '';
     }
 }
