@@ -46,10 +46,27 @@ final readonly class FilamentMacroMethodsExtension implements MethodsClassReflec
             return null;
         }
 
-        $macro = $classReflection->getNativeReflection()
-            ->getMethod('getMacro')
-            ->invoke(null, $methodName);
+        /**
+         * Mesma busca do `Macroable::getMacro()`: o macro fica em `$macros[$nome][$classe]`, procurando na classe e
+         * depois nos pais.
+         */
+        $macros = $classReflection->getNativeReflection()
+            ->getProperty('macros')
+            ->getValue();
+        $candidates = is_array($macros) ? ($macros[$methodName] ?? null) : null;
 
-        return is_callable($macro) ? Closure::fromCallable($macro) : null;
+        if (! is_array($candidates)) {
+            return null;
+        }
+
+        foreach ([$className, ...$classReflection->getParentClassesNames()] as $class) {
+            $macro = $candidates[$class] ?? null;
+
+            if (is_callable($macro)) {
+                return Closure::fromCallable($macro);
+            }
+        }
+
+        return null;
     }
 }
