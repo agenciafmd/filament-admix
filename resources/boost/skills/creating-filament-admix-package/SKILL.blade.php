@@ -12,16 +12,22 @@ metadata:
     return [ 'name' => 'Articles', 'navigation_group' => null, 'navigation_sort' => 6, ];
 @endboostsnippet
 
-- /database/factories/ArticleFactory.php fabrica de dados para inserirmos no banco
+- /database/factories/ArticleFactory.php fabrica de dados para inserirmos no banco. Declare
+@verbatim`@extends Factory<Article>`@endverbatim e `protected $model = Article::class`: o Seeder usa
+`ArticleFactory::new()`, que sem `$model` procuraria `App\Models\Article`. Para o slug, passe o texto para o helper
+(`str($title)->slug()->toString()`); o `str()` sem argumento não é tipado
 
 @boostsnippet('Example content of ArticleFactory', 'php')
-    public function definition(): array { $title = fake()->sentence(4); $slug = str($title)->slug(); return [
+    declare(strict_types=1); namespace Agenciafmd\Articles\Database\Factories; use Agenciafmd\Articles\Models\Article;
+    use Illuminate\Database\Eloquent\Factories\Factory; use Illuminate\Support\Facades\Storage; /** @extends
+    Factory<Article> */ final class ArticleFactory extends Factory { protected $model = Article::class; public
+    function definition(): array { $title = fake()->sentence(4); $slug = str($title)->slug()->toString(); return [
     'is_active' => fake()->boolean(), 'star' => fake()->boolean(), 'title' => $title, 'subtitle' => fake()->sentence(8),
     'summary' => fake()->text(), 'content' => fake()->htmlParagraphs(), 'video' => fake()->youtubeRandomUri(),
     'published_at' => fake()->dateTimeBetween(now()->subMonths(6), now()->addDay()), 'tags' => fake()->tags(), 'image'
     => Storage::putFile('fake', fake()->localImage(ratio: '16:9')), 'images' => collect(range(0,
     fake()->numberBetween(1, 6))) ->map(fn () => Storage::putFile('fake', fake()->localImage(ratio: '16:9')))
-    ->toArray(), 'slug' => $slug, ]; }
+    ->all(), 'slug' => $slug, ]; } }
 @endboostsnippet
 
 utilize a relação de valores abaixo para os campos, caso sejam solicitados. | campo | padrão |
@@ -72,7 +78,10 @@ adicione `->nullable()` para os campos que não são obrigatórios adicione os c
 - /src/Models/Article.php não utilizar o fillable utilize a trait `WithScopes` (`Agenciafmd\Admix\Traits\WithScopes`)
 para os scopes `isActive` e `sort` — ela lê a propriedade `$defaultSort` do Model, que é obrigatória, então não
 reimplemente ordenação manualmente. O `prunable()` usa `today()` (e não `now()`), para que o corte seja sempre a
-meia-noite do dia
+meia-noite do dia. @verbatim Tipagem esperada no Model: `/** @use HasFactory<ArticleFactory> */` no trait,
+`@var array<string, 'asc'|'desc'>` no `$defaultSort` e `@return Builder<self>` no `prunable()`. Accessors (`Attribute`)
+declaram `@return Attribute<Tipo, never>`; um accessor que devolve `RichContentRenderer` usa `'<p></p>'` quando o
+conteúdo estiver vazio, porque o renderer do Filament quebra com `null` ou string vazia @endverbatim
 
 @boostsnippet('Example of content of Article', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Models; use Agenciafmd\Admix\Traits\WithScopes; use
@@ -81,9 +90,10 @@ meia-noite do dia
     Illuminate\Database\Eloquent\Model; use Illuminate\Database\Eloquent\Prunable; use
     Illuminate\Database\Eloquent\SoftDeletes; use Override; use OwenIt\Auditing\Auditable; use
     OwenIt\Auditing\Contracts\Auditable as AuditableContract; #[UseFactory(ArticleFactory::class)] final class Article
-    extends Model implements AuditableContract { use Auditable; use HasFactory; use Prunable; use SoftDeletes; use
-    WithScopes; protected array $defaultSort = [ 'is_active' => 'desc', 'star' => 'desc', 'published_at' => 'desc',
-    'title' => 'asc', ]; public function prunable(): Builder { return self::query() ->where('deleted_at', '<=',
+    extends Model implements AuditableContract { use Auditable; /** @use HasFactory<ArticleFactory> */ use HasFactory;
+    use Prunable; use SoftDeletes; use WithScopes; /** @var array<string, 'asc'|'desc'> */ protected array $defaultSort
+    = [ 'is_active' => 'desc', 'star' => 'desc', 'published_at' => 'desc', 'title' => 'asc', ]; /** @return
+    Builder<self> */ public function prunable(): Builder { return self::query() ->where('deleted_at', '<=',
     today()->subDays(30)); } #[Override] protected function casts(): array { return [ 'is_active' => 'boolean', 'star'
     => 'boolean', 'tags' => 'array', 'images' => 'array', 'published_at' => 'timestamp', ]; } }
 @endboostsnippet
@@ -111,7 +121,7 @@ published_at e title ou name - /src/Providers/ArticleServiceProvider.php respons
     Illuminate\Console\Scheduling\Schedule; use Illuminate\Support\ServiceProvider; final class CommandServiceProvider
     extends ServiceProvider { public function boot(): void { if (! $this->app->runningInConsole()) { return; }
     $this->commands([ // ]); $this->app->booted(function () { $schedule = $this->app->make(Schedule::class); $minutes =
-    config('filament-admix.schedule.minutes'); $schedule->command('model:prune', [ '--model' => [ Article::class, ],
+    config()->string('filament-admix.schedule.minutes', '00'); $schedule->command('model:prune', [ '--model' => [ Article::class, ],
     ])->dailyAt("03:{$minutes}"); }); } }
 @endboostsnippet
 
@@ -128,15 +138,19 @@ para retornar para a lista após criar um novo registro
 - /src/Resources/Articles/Pages/EditArticle.php registramos o resource de articles e aplicamos o trait RedirectBack para
 retornar para a lista após criar um novo registro registramos o listener de `auditRestored` para atualizamos o registro
 após restaurar do audit adicionamos no `getHeaderActions` as ações de deletar `DeleteAction::make()`, forçar deleção
-(ForceDeleteAction::make()) e restaurar (RestoreAction::make())
+(ForceDeleteAction::make()) e restaurar (RestoreAction::make()). O `$listeners` recebe o PHPDoc com o tipo
+`array<int, string>`, e o `getRelationManagers()` confere o tipo do registro com `$this->getRecord()` antes de chamar
+`trashed()`
 
 @boostsnippet('Example content of EditArticle', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Resources\Articles\Pages; use
     Agenciafmd\Admix\Resources\Concerns\RedirectBack; use Agenciafmd\Articles\Resources\Articles\ArticleResource; use
     Filament\Actions\DeleteAction; use Filament\Actions\ForceDeleteAction; use Filament\Actions\RestoreAction; use
-    Filament\Resources\Pages\EditRecord; final class EditArticle extends EditRecord { use RedirectBack; protected static
-    string $resource = ArticleResource::class; protected $listeners = [ 'auditRestored', ]; public function
-    getRelationManagers(): array { if ($this->record->trashed()) { return []; } return parent::getRelationManagers(); }
+    Filament\Resources\Pages\EditRecord; use Agenciafmd\Articles\Models\Article; final class EditArticle extends
+    EditRecord { use RedirectBack; protected static string $resource = ArticleResource::class; /** @var array<int,
+    string> */ protected $listeners = [ 'auditRestored', ]; public function getRelationManagers(): array { $record =
+    $this->getRecord(); if ($record instanceof Article && $record->trashed()) { return []; } return
+    parent::getRelationManagers(); }
     public function auditRestored(): void { $this->fillForm(); } protected function getHeaderActions(): array { return [
     DeleteAction::make(), ForceDeleteAction::make(), RestoreAction::make(), ]; } }
 @endboostsnippet
@@ -153,7 +167,8 @@ ações de criar novo registro `CreateAction::make()`
 @endboostsnippet
 
 - /src/Resources/Articles/ArticleResource.php resource de articles `getNavigationSort()` e `getNavigationGroup()` leem
-do config do pacote, permitindo reordenar/reagrupar o menu sem alterar código `form()`/`table()` só delegam pras classes
+do config do pacote, permitindo reordenar/reagrupar o menu sem alterar código; como o config pode estar nulo, confira o
+tipo do valor (`is_int()`/`is_string()`) antes de retornar `form()`/`table()` só delegam pras classes
 `ArticleForm`/`ArticlesTable` — veja as skills `filament-admix-form-fields` e `filament-admix-table-conventions` pra
 montar o conteúdo delas `getRelations()` lista os RelationManagers do recurso, sempre com o
 `AuditsRelationManager::class` por último; os RelationManagers próprios do pacote ficam em
@@ -176,9 +191,10 @@ proteja a action com `->authorize()` — veja a skill `filament-admix-permission
     protected static ?string $model = Article::class; protected static string|BackedEnum|null $navigationIcon =
     Heroicon::OutlinedPencilSquare; protected static ?string $recordTitleAttribute = 'title'; public static function
     getModelLabel(): string { return __('Article'); } public static function getPluralModelLabel(): string { return
-    __('Articles'); } public static function getNavigationSort(): ?int { return
-    config('local-articles.navigation_sort'); } public static function getNavigationGroup(): ?string { return
-    config('local-articles.navigation_group'); } public static function form(Schema $schema): Schema { return
+    __('Articles'); } public static function getNavigationSort(): ?int { $navigationSort =
+    config('local-articles.navigation_sort'); return is_int($navigationSort) ? $navigationSort : null; } public static
+    function getNavigationGroup(): ?string { $navigationGroup = config('local-articles.navigation_group'); return
+    is_string($navigationGroup) ? $navigationGroup : null; } public static function form(Schema $schema): Schema { return
     ArticleForm::configure($schema); } public static function table(Table $table): Table { return
     ArticlesTable::configure($table); } public static function getRelations(): array { return [
     AuditsRelationManager::class, ]; } public static function getPages(): array { return [ 'index' =>
@@ -188,14 +204,19 @@ proteja a action com `->authorize()` — veja a skill `filament-admix-permission
 @endboostsnippet
 
 - /src/Services/ArticleService.php serviço do resource de articles usado quando precisamos de regras de negócio
-específicas no caso abaixo, para obter a lista de tags únicas já cadastradas e utilizarmos no formulário e tabela
+específicas no caso abaixo, para obter a lista de tags únicas já cadastradas e utilizarmos no formulário e tabela.
+Declare no PHPDoc o tipo da Collection (`Collection<string, string>`) e do builder (`Builder<Article>`). Para estreitar
+os valores, filtre com uma arrow function que checa o tipo (`->filter(fn (mixed $tag): bool => is_string($tag))`), que
+o PHPStan entende; valores lidos do config seguem a mesma regra
 
 @boostsnippet('Example content of ArticleService', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Services; use Agenciafmd\Articles\Models\Article; use
     Illuminate\Database\Eloquent\Builder; use Illuminate\Support\Collection; final class ArticleService { public static
-    function make(): static { return resolve(self::class); } public function tags(): Collection { return
-    $this->queryBuilder() ->pluck('tags') ->filter() ->flatten() ->unique() ->mapWithKeys(fn ($item) => [$item =>
-    $item]) ->sort(); } private function queryBuilder(): Builder { return Article::query(); } }
+    function make(): static { return resolve(self::class); } /** @return Collection<string, string> */ public function
+    tags(): Collection { return $this->queryBuilder() ->pluck('tags') ->filter(static fn (mixed $tags): bool =>
+    is_array($tags)) ->flatten() ->filter(static fn (mixed $tag): bool => is_string($tag)) ->unique()
+    ->mapWithKeys(static fn (string $tag): array => [$tag => $tag]) ->sort(); } /** @return Builder<Article> */ private
+    function queryBuilder(): Builder { return Article::query(); } }
 @endboostsnippet
 
 - /src/ArticlesPlugin.php classe principal do pacote aqui registramos o resource no painel administrativo (admix)
@@ -206,4 +227,20 @@ específicas no caso abaixo, para obter a lista de tags únicas já cadastradas 
     function make(): static { return resolve(self::class); } public function getId(): string { return 'articles'; }
     public function register(Panel $panel): void { $panel ->resources([ ArticleResource::class, ]); } public function
     boot(Panel $panel): void { // } }
+@endboostsnippet
+
+- /tests/Feature os testes do pacote ficam dentro do próprio pacote, espelhando o caminho da classe em `/src` (ex.:
+`/src/Services/ArticleService.php` vira `/tests/Feature/Services/ArticleServiceTest.php`); a suíte `Packages` do
+`phpunit.xml` do projeto encontra os testes sozinha. Cada arquivo declara o namespace
+`Agenciafmd\Articles\Tests\Feature\...` e `uses(TestCase::class, RefreshDatabase::class)`, porque o `tests/Pest.php`
+do projeto só vale para a pasta `tests/`
+
+@boostsnippet('Example content of ArticleServiceTest', 'php')
+    declare(strict_types=1); namespace Agenciafmd\Articles\Tests\Feature\Services; use
+    Agenciafmd\Articles\Models\Article; use Agenciafmd\Articles\Services\ArticleService; use
+    Illuminate\Foundation\Testing\RefreshDatabase; use Illuminate\Support\Facades\Storage; use Tests\TestCase;
+    uses(TestCase::class, RefreshDatabase::class); it('lists each tag once and in alphabetical order', function ():
+    void { Storage::fake(); Article::factory()->create(['tags' => ['Projetos', 'Economia']]);
+    Article::factory()->create(['tags' => ['Economia']]); expect(ArticleService::make()->tags()->all())->toBe([
+    'Economia' => 'Economia', 'Projetos' => 'Projetos', ]); });
 @endboostsnippet

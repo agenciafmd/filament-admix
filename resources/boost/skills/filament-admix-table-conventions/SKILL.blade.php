@@ -15,7 +15,11 @@ a skill `creating-filament-admix-package`) o `BulkActionGroup`, deve conter `Del
 as colunas editáveis (ToggleColumn etc.) já respeitam as permissões do Grupo do usuário; uma action própria
 (`Action::make('send')`) precisa de `->authorize('send')` e da ability declarada em `getExtraPermissions()` no Resource
 — veja a skill `filament-admix-permissions`. Ao chamar `->disabled()` numa coluna editável, inclua
-`Gate::denies('update', $record)` na condição, pois ela sobrescreve o padrão
+`Gate::denies('update', $record)` na condição, pois ela sobrescreve o padrão. O formato de data das colunas vem de
+`config()->string('filament-admix.timestamp.format', 'd/m/Y H:i:s')`. Os valores dos filtros (`$data`) chegam como
+`mixed`: leia cada um pelo helper privado `filterValue()`, que devolve `string|null`, e tipe o valor na closure do
+`when()` (`string $value`, `string $date`). O `$query->sort()` do `defaultSort` é reconhecido pelo PHPStan por uma
+extensão do admix, então não precisa de anotação
 
 @boostsnippet('Example content of ArticlesTable', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Resources\Articles\Tables; use
@@ -27,19 +31,22 @@ as colunas editáveis (ToggleColumn etc.) já respeitam as permissões do Grupo 
     Filament\Tables\Filters\TrashedFilter; use Filament\Tables\Table; use Illuminate\Database\Eloquent\Builder; final
     class ArticlesTable { public static function configure(Table $table): Table { return $table ->columns([
     TextColumn::make('title') ->translateLabel() ->sortable() ->searchable(), TextColumn::make('published_at')
-    ->translateLabel() ->dateTime(config('filament-admix.timestamp.format')) ->sortable(), ToggleColumn::make('star')
+    ->translateLabel() ->dateTime(config()->string('filament-admix.timestamp.format', 'd/m/Y H:i:s')) ->sortable(),
+    ToggleColumn::make('star')
     ->translateLabel() ->sortable(), ToggleColumn::make('is_active') ->translateLabel() ->sortable(), ]) ->filters([
     TernaryFilter::make('is_active') ->translateLabel(), TernaryFilter::make('star') ->translateLabel(),
-    SelectFilter::make('tags') ->translateLabel() ->options(fn (): array => ArticleService::make() ->tags() ->toArray())
-    ->query(function (Builder $query, array $data): Builder { return $query->when($data['value'], fn (Builder $query,
-    $value): Builder => $query->whereJsonContains('tags', $value)); }), Filter::make('published_at') ->schema([
-    DateTimePicker::make('published_from') ->translateLabel(), DateTimePicker::make('published_until')
-    ->translateLabel(), ]) ->query(function (Builder $query, array $data): Builder { return $query ->when(
-    $data['published_from'], fn (Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date), )
-    ->when( $data['published_until'], fn (Builder $query, $date): Builder => $query->whereDate('published_at', '<=',
-    $date), ); }), TrashedFilter::make(), ]) ->recordActions([ EditAction::make(), ]) ->toolbarActions([
-    BulkActionGroup::make([ DeleteBulkAction::make(), ForceDeleteBulkAction::make(), RestoreBulkAction::make(), ]), ])
-    ->defaultSort(fn (Builder $query): Builder => $query->sort()); } }
+    SelectFilter::make('tags') ->translateLabel() ->options(fn (): array => ArticleService::make() ->tags() ->all())
+    ->query(fn (Builder $query, array $data): Builder => $query->when(self::filterValue($data, 'value'), fn (Builder
+    $query, string $value): Builder => $query->whereJsonContains('tags', $value))), Filter::make('published_at')
+    ->schema([ DateTimePicker::make('published_from') ->translateLabel(), DateTimePicker::make('published_until')
+    ->translateLabel(), ]) ->query(fn (Builder $query, array $data): Builder => $query ->when(
+    self::filterValue($data, 'published_from'), fn (Builder $query, string $date): Builder =>
+    $query->whereDate('published_at', '>=', $date), ) ->when( self::filterValue($data, 'published_until'), fn (Builder
+    $query, string $date): Builder => $query->whereDate('published_at', '<=', $date), )), TrashedFilter::make(), ])
+    ->recordActions([ EditAction::make(), ]) ->toolbarActions([ BulkActionGroup::make([ DeleteBulkAction::make(),
+    ForceDeleteBulkAction::make(), RestoreBulkAction::make(), ]), ]) ->defaultSort(fn (Builder $query): Builder =>
+    $query->sort()); } /** @param array<array-key, mixed> $data */ private static function filterValue(array $data,
+    string $key): ?string { $value = $data[$key] ?? null; return is_string($value) && $value !== '' ? $value : null; } }
 @endboostsnippet
 
 # RelationManager - /src/Resources/Articles/RelationManagers/CommentsRelationManager.php um RelationManager é uma
@@ -71,6 +78,7 @@ model listado.
     ->columns([ TextColumn::make('name') ->translateLabel() ->sortable() ->searchable(),
     TextColumn::make('favorited_at') ->label(__('Favorited at')) ->state(function (Franchisee $record): ?CarbonInterface
     { $pivot = $record->getRelation('pivot'); return $pivot instanceof Pivot ? $pivot->created_at : null; })
-    ->dateTime(config('filament-admix.timestamp.format')), IconColumn::make('is_active') ->translateLabel() ->boolean()
+    ->dateTime(config()->string('filament-admix.timestamp.format', 'd/m/Y H:i:s')), IconColumn::make('is_active')
+    ->translateLabel() ->boolean()
     ->sortable(), ]) ->defaultSort(fn (Builder $query): Builder => $query->sort()); } }
 @endboostsnippet

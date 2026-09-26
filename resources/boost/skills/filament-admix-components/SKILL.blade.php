@@ -26,8 +26,20 @@ Agenciafmd\Admix\Resources\Infolists\Components | exibição (infolist) de data/
 no formulário | Traits e concerns reutilizáveis: | trait/concern | namespace | descrição |
 |------------+-----------+-----------| | RedirectBack | Agenciafmd\Admix\Resources\Concerns | usado nas Pages de
 Create/Edit para retornar à listagem após salvar | | WithScopes | Agenciafmd\Admix\Traits | fornece os scopes `isActive`
-e `sort` para o Model; leia `$defaultSort` em vez de reimplementar ordenação | | PermissionRegistry |
+e `sort` para o Model; o `sort` lê o `$defaultSort`, que é obrigatório no Model, em vez de reimplementar ordenação | | PermissionRegistry |
 Agenciafmd\Admix\Permissions | lista as permissões dos Resources do painel e monta as chaves `{ResourceClass}@{ability}`
 (`permissionKey()`, `permissionFor()`); não reimplemente listas de permissões | | ResourcePolicy |
 Agenciafmd\Admix\Policies | policy genérica registrada automaticamente para os models dos Resources; não crie Policy por
 model (veja a skill `filament-admix-permissions`) |
+
+Extensões do PHPStan: o admix e o `laravel-support` registram extensões pelo `phpstan/extension-installer`, então não
+anote nem ignore os erros que elas resolvem.
+
+| extensão | pacote | o que o PHPStan passa a entender |
+|----------|--------|----------------------------------|
+| FilamentMacroMethodsExtension | filament-admix | macros registrados com o `Macroable` do Filament, como `TextInput::generateSlug()`, `TextColumn::limitWithTooltip()` e o `optimize()` do `image-optimizer` |
+| WithScopesBuilderMethodsExtension | filament-admix | os scopes do `WithScopes` num `Builder` sem model definido, como o `$query->sort()` do `defaultSort` das Tables |
+| FakerProviderMethodsExtension | laravel-support | os métodos do nosso Faker `Provider`, como `localImage()`, `htmlParagraphs()`, `tags()` e `youtubeRandomUri()` |
+
+Um macro novo do Filament, registrado no `boot()` de um ServiceProvider, é reconhecido automaticamente. Dentro da closure
+do macro, o `$this` já é o componente, então não é preciso anotar o tipo do `$this`.

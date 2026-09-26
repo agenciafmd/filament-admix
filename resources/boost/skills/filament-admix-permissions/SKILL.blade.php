@@ -60,7 +60,9 @@ abilities padrão - a action continua usando `->visible()`/`->hidden()` para reg
 permissão ## Policy própria Se o pacote precisar de uma regra que não cabe nas abilities (ex.: só o autor edita), crie a
 Policy e registre com `Gate::policy()` no ServiceProvider do pacote. O admix **não** sobrescreve policies existentes —
 nesse caso a Policy do pacote é responsável por todas as checagens (inclusive administrador e `hasPermission()`), então
-prefira as abilities extras sempre que possível. ## Testes - autentique no guard `admix-web` e defina o painel:
+prefira as abilities extras sempre que possível. ## Testes - os testes ficam em `/tests/Feature` do próprio pacote,
+com namespace e `uses(TestCase::class, RefreshDatabase::class)` (veja a skill `creating-filament-admix-package`) -
+autentique no guard `admix-web` e defina o painel:
 `actingAs($user, 'admix-web'); Filament::setCurrentPanel('admix');` - recarregue o usuário criado pela factory
 (`->fresh()`): o strict mode lança `MissingAttributeException` para colunas não preenchidas (ex.: `avatar`) ao
 renderizar o painel - use os states da `RoleFactory`: `->withPermissions([...])` e `->inactive()`; sem `role_id` o
