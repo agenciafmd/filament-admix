@@ -19,7 +19,7 @@ final class AuditPrune extends Command
         $days = (int) $this->argument('days');
 
         $count = Audit::query()
-            ->where('created_at', '<=', now()->subDays($days))
+            ->where('created_at', '<=', today()->subDays($days))
             ->getQuery()
             ->delete();
 

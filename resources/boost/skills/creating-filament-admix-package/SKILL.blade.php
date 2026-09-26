@@ -70,8 +70,9 @@ adicione `->nullable()` para os campos que não são obrigatórios adicione os c
 @endboostsnippet
 
 - /src/Models/Article.php não utilizar o fillable utilize a trait `WithScopes` (`Agenciafmd\Admix\Traits\WithScopes`)
-para os scopes `isActive` e `sort` — ela lê a propriedade `$defaultSort` do Model, então não reimplemente ordenação
-manualmente
+para os scopes `isActive` e `sort` — ela lê a propriedade `$defaultSort` do Model, que é obrigatória, então não
+reimplemente ordenação manualmente. O `prunable()` usa `today()` (e não `now()`), para que o corte seja sempre a
+meia-noite do dia
 
 @boostsnippet('Example of content of Article', 'php')
     declare(strict_types=1); namespace Agenciafmd\Articles\Models; use Agenciafmd\Admix\Traits\WithScopes; use
@@ -83,7 +84,7 @@ manualmente
     extends Model implements AuditableContract { use Auditable; use HasFactory; use Prunable; use SoftDeletes; use
     WithScopes; protected array $defaultSort = [ 'is_active' => 'desc', 'star' => 'desc', 'published_at' => 'desc',
     'title' => 'asc', ]; public function prunable(): Builder { return self::query() ->where('deleted_at', '<=',
-    now()->subDays(30)); } #[Override] protected function casts(): array { return [ 'is_active' => 'boolean', 'star' =>
+    today()->subDays(30)); } #[Override] protected function casts(): array { return [ 'is_active' => 'boolean', 'star' =>
     'boolean', 'tags' => 'array', 'images' => 'array', 'published_at' => 'timestamp', ]; } }
 @endboostsnippet
 

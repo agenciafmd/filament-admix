@@ -105,7 +105,7 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
     public function prunable(): Builder
     {
         return self::query()
-            ->where('deleted_at', '<=', now()->subDays(30));
+            ->where('deleted_at', '<=', today()->subDays(30));
     }
 
     #[Override]
