@@ -7,6 +7,7 @@ namespace Agenciafmd\Admix\Providers;
 use Agenciafmd\Admix\Commands\AdmixCreateUser;
 use Agenciafmd\Admix\Commands\AuditPrune;
 use Agenciafmd\Admix\Commands\NotificationsClear;
+use Agenciafmd\Admix\Models\Role;
 use Agenciafmd\Admix\Models\User;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\File;
@@ -55,14 +56,15 @@ final class CommandServiceProvider extends ServiceProvider
             $schedule->command('audit:prune')
                 ->withoutOverlapping()
                 ->dailyAt("03:{$minutes}");
-            //            $schedule->command('model:prune', [
-            //                '--model' => [
-            //                    Role::class,
-            //                ],
-            //            ])->dailyAt("03:{$minutes}");
             $schedule->command('model:prune', [
                 '--model' => [
                     User::class,
+                ],
+            ])
+                ->dailyAt("03:{$minutes}");
+            $schedule->command('model:prune', [
+                '--model' => [
+                    Role::class,
                 ],
             ])
                 ->dailyAt("03:{$minutes}");
