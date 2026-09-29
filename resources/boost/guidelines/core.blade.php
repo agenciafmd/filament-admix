@@ -37,6 +37,8 @@ Ex.
 - prefira os helpers do Laravel às classes e facades: `str($value)->slug()->toString()` no lugar de `Str::slug($value)` ou `Str::of($value)`, `collect()` no lugar de `Collection::make()`, e `today()`, `now()`, `config()`, `cache()`, `resolve()`, `view()` no lugar das facades equivalentes
 - passe sempre o valor para o `str()` (`str($value)`); sem argumento ele devolve um objeto não tipado
 - a exceção são as macros: registre e chame macros pela classe (`Str::macro('acronym', ...)`, `Str::acronym(...)` dentro de outra macro)
+- métodos que geram valor sem receber texto continuam pela classe (`Str::random(10)`, `Str::uuid()`, `Str::ulid()`), já que não há valor para passar ao `str()`
+- os arquivos de config que vieram do skeleton do Laravel (`config/cache.php`, `config/session.php`, `config/database.php`, `config/horizon.php`, etc.) mantêm o `Str::` original, para facilitar a comparação nos upgrades do framework
 
 ### Estrutura de arquivos
 

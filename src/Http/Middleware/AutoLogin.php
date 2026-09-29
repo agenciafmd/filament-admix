@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class AutoLogin
 {
+    /**
+     * @param  Closure(Request): Response  $next
+     */
     public function handle(Request $request, Closure $next): Response
     {
         $guard = Filament::auth();
