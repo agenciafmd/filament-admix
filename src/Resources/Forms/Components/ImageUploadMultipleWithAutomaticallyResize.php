@@ -13,8 +13,8 @@ final class ImageUploadMultipleWithAutomaticallyResize
         string $name,
         string $directory,
         string $fileNameField = 'name',
-        string|Closure $width = '1920',
-        string|Closure $height = '1080',
+        int|string|Closure $width = 1920,
+        int|string|Closure $height = 1080,
         string $format = 'jpg',
         int $quality = 95,
     ): FileUpload {

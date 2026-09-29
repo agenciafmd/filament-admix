@@ -119,7 +119,7 @@ aceitam. Valores que vêm do formulário (`$get('campo')`) também são `mixed`:
     TextInput::make('subtitle') ->translateLabel() ->maxLength(255)
     ->visible(config()->boolean('local-articles.subtitle.visible', false)) ->columnSpanFull(),
     ImageUploadWithAutomaticallyResize::make( name: 'image', directory: 'article/image', fileNameField: 'title', width:
-    (string) config()->integer('local-articles.image.width', 1920), height: (string)
+    config()->integer('local-articles.image.width', 1920), height:
     config()->integer('local-articles.image.height', 1080), ) ->visible(config()->boolean('local-articles.image.visible',
     true)),
 @endboostsnippet

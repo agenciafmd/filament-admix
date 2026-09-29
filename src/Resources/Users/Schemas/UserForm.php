@@ -70,8 +70,8 @@ final class UserForm
                                     ImageUploadWithAutomaticallyResize::make(
                                         name: 'avatar',
                                         directory: 'user/avatar',
-                                        width: '500',
-                                        height: '500',
+                                        width: 500,
+                                        height: 500,
                                     )
                                         ->avatar()
                                         ->alignCenter(),

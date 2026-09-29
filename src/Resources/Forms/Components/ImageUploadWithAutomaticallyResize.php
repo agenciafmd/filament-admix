@@ -6,7 +6,6 @@ namespace Agenciafmd\Admix\Resources\Forms\Components;
 
 use Closure;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Utilities\Get;
 
 final class ImageUploadWithAutomaticallyResize
 {
@@ -14,8 +13,8 @@ final class ImageUploadWithAutomaticallyResize
         string $name,
         string $directory,
         string $fileNameField = 'name',
-        string|Closure $width = '1920',
-        string|Closure $height = '1080',
+        int|string|Closure $width = 1920,
+        int|string|Closure $height = 1080,
         string $format = 'jpg',
         int $quality = 95,
     ): FileUpload {
@@ -28,20 +27,21 @@ final class ImageUploadWithAutomaticallyResize
             ->openable()
             ->image()
             ->automaticallyResizeImagesMode('cover') // Options: 'cover', 'contain', 'force'
-            ->automaticallyResizeImagesToWidth($width)
-            ->automaticallyResizeImagesToHeight($height)
+            ->automaticallyResizeImagesToWidth(self::dimension($width))
+            ->automaticallyResizeImagesToHeight(self::dimension($height))
             ->imageEditor(false)
-            ->afterLabel(static fn (Get $get): string => 'Max. ' . self::resolveDimension($width, $get) . 'x' . self::resolveDimension($height, $get));
+            ->afterLabel(static fn (FileUpload $component): string => "Max. {$component->getAutomaticallyResizeImagesWidth()}x{$component->getAutomaticallyResizeImagesHeight()}");
 
         $upload->optimize(format: $format, quality: $quality);
 
         return $upload;
     }
 
-    private static function resolveDimension(string|Closure $dimension, Get $get): string
+    /**
+     * O Filament só aceita `string|Closure`; closures são avaliadas por ele, com injeção de `Get`, `$record` etc.
+     */
+    private static function dimension(int|string|Closure $dimension): string|Closure
     {
-        $value = $dimension instanceof Closure ? $dimension($get) : $dimension;
-
-        return is_scalar($value) ? (string) $value : '';
+        return is_int($dimension) ? (string) $dimension : $dimension;
     }
 }
