@@ -34,6 +34,9 @@ Ex.
 - classes de Model, Resource, Schema (Form), Table, Service, ServiceProvider e Pages (Create/Edit/List) são `final class`
 - quando o Model utilizar mais de um trait, declare um `use` por linha (não combine em uma única linha)
 - métodos que sobrescrevem método de classe pai (ex.: `casts()`) recebem o atributo `#[Override]` (`use Override;`)
+- prefira os helpers do Laravel às classes e facades: `str($value)->slug()->toString()` no lugar de `Str::slug($value)` ou `Str::of($value)`, `collect()` no lugar de `Collection::make()`, e `today()`, `now()`, `config()`, `cache()`, `resolve()`, `view()` no lugar das facades equivalentes
+- passe sempre o valor para o `str()` (`str($value)`); sem argumento ele devolve um objeto não tipado
+- a exceção são as macros: registre e chame macros pela classe (`Str::macro('acronym', ...)`, `Str::acronym(...)` dentro de outra macro)
 
 ### Estrutura de arquivos
 

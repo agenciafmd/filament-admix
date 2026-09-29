@@ -46,7 +46,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Override;
 
@@ -185,11 +184,11 @@ final class FilamentPanelProvider extends PanelProvider
         });
 
         TextInput::configureUsing(static function (TextInput $textInput): void {
-            $textInput->dehydrateStateUsing(fn (?string $state): ?string => $state ? Str::trim($state) : $state);
+            $textInput->dehydrateStateUsing(fn (?string $state): ?string => $state ? str($state)->trim()->toString() : $state);
         });
 
         Textarea::configureUsing(static function (Textarea $textarea): void {
-            $textarea->dehydrateStateUsing(fn (?string $state): ?string => $state ? Str::trim($state) : $state);
+            $textarea->dehydrateStateUsing(fn (?string $state): ?string => $state ? str($state)->trim()->toString() : $state);
         });
 
         TextInput::macro('generateSlug', fn (string $slugField = 'slug'): TextInput => $this
