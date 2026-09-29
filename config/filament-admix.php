@@ -11,6 +11,11 @@ return [
     'timestamp' => [
         'format' => env('ADMIX_TIMESTAMP_FORMAT', 'd/m/Y H:i:s'),
     ],
+    /*
+     * Local environment only: logs in automatically on the admix panel.
+     * Use an e-mail to log in as that user, or true for the first active administrator.
+     */
+    'auto_login' => env('ADMIX_AUTO_LOGIN', true),
     'plugins' => [
         //        ArticlesPlugin::class,
     ],
