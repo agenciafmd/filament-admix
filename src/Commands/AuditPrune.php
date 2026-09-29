@@ -18,11 +18,10 @@ final class AuditPrune extends Command
     {
         $days = (int) $this->argument('days');
 
-        $count = Audit::query()
+        Audit::query()
             ->where('created_at', '<=', today()->subDays($days))
-            ->getQuery()
             ->delete();
 
-        $this->components->info("Deleted {$count} audit records.");
+        $this->components->info('Registros removidos com sucesso.');
     }
 }

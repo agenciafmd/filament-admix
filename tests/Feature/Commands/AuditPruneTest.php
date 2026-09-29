@@ -27,7 +27,7 @@ function auditCreatedAt(string $createdAt): array
     ];
 }
 
-it('deletes the audits older than the given days and reports the count', function (): void {
+it('deletes the audits older than the given days and report', function (): void {
     travelTo('2026-09-25 12:00:00');
     DB::table('audits')->insert([
         auditCreatedAt('2026-01-01 12:00:00'),
@@ -35,7 +35,7 @@ it('deletes the audits older than the given days and reports the count', functio
     ]);
 
     artisan('audit:prune', ['days' => 180])
-        ->expectsOutputToContain('Deleted 1 audit records.')
+        ->expectsOutputToContain('Registros removidos com sucesso.')
         ->assertSuccessful();
 
     expect(DB::table('audits')->pluck('created_at')->all())->toBe(['2026-09-20 12:00:00']);
