@@ -6,6 +6,9 @@ namespace Agenciafmd\Admix\Resources\Forms\Components;
 
 use Closure;
 use Filament\Forms\Components\FileUpload;
+use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\ImageManager;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 final class ImageUploadWithAutomaticallyResize
 {
@@ -18,7 +21,7 @@ final class ImageUploadWithAutomaticallyResize
         string $format = 'jpg',
         int $quality = 95,
     ): FileUpload {
-        $upload = FileUploadWithDefault::make(
+        return FileUploadWithDefault::make(
             name: $name,
             directory: $directory,
             fileNameField: $fileNameField,
@@ -30,11 +33,33 @@ final class ImageUploadWithAutomaticallyResize
             ->automaticallyResizeImagesToWidth(self::dimension($width))
             ->automaticallyResizeImagesToHeight(self::dimension($height))
             ->imageEditor(false)
-            ->afterLabel(static fn (FileUpload $component): string => "Max. {$component->getAutomaticallyResizeImagesWidth()}x{$component->getAutomaticallyResizeImagesHeight()}");
+            ->afterLabel(static fn (FileUpload $component): string => "Max. {$component->getAutomaticallyResizeImagesWidth()}x{$component->getAutomaticallyResizeImagesHeight()}")
+            ->saveUploadedFileUsing(static fn (FileUpload $component, TemporaryUploadedFile $file): string => self::store($component, $file, $format, $quality));
+    }
 
-        $upload->optimize(format: $format, quality: $quality);
+    /**
+     * Amplia a imagem até o menor lado atingir o alvo e corta o excedente do maior lado, centralizado,
+     * garantindo o tamanho exato mesmo quando o navegador não transformou o arquivo.
+     */
+    private static function store(FileUpload $component, TemporaryUploadedFile $file, string $format, int $quality): string
+    {
+        $image = new ImageManager(new Driver)
+            ->read($file->getRealPath())
+            ->cover(
+                width: (int) $component->getAutomaticallyResizeImagesWidth(),
+                height: (int) $component->getAutomaticallyResizeImagesHeight(),
+            );
 
-        return $upload;
+        $path = str($component->getUploadedFileNameForStorage($file))
+            ->beforeLast('.')
+            ->append(".{$format}")
+            ->prepend(mb_trim((string) $component->getDirectory(), '/') . '/')
+            ->ltrim('/')
+            ->toString();
+
+        $component->getDisk()->put($path, (string) $image->encodeByExtension($format, quality: $quality));
+
+        return $path;
     }
 
     /**
