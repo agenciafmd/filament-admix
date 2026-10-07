@@ -33,7 +33,7 @@ Ex.
 - todo arquivo PHP começa com `declare(strict_types=1);`
 - classes de Model, Resource, Schema (Form), Table, Service, ServiceProvider e Pages (Create/Edit/List) são `final class`
 - quando o Model utilizar mais de um trait, declare um `use` por linha (não combine em uma única linha)
-- métodos que sobrescrevem método de classe pai (ex.: `casts()`) recebem o atributo `#[Override]` (`use Override;`)
+- métodos que sobrescrevem método de classe pai recebem o atributo `#[Override]` (`use Override;`), tanto os do Laravel (`casts()`, `definition()`, `register()`) quanto os do Filament (`form()`, `table()`, `getPages()`, `getRelations()`, `getHeaderActions()`, `getRelationManagers()`, `getRecordRouteBindingEloquentQuery()`, `getModelLabel()`...); métodos que só implementam uma interface (ex.: os do `Plugin`) não recebem
 - prefira os helpers do Laravel às classes e facades: `str($value)->slug()->toString()` no lugar de `Str::slug($value)` ou `Str::of($value)`, `collect()` no lugar de `Collection::make()`, e `today()`, `now()`, `config()`, `cache()`, `resolve()`, `view()` no lugar das facades equivalentes
 - passe sempre o valor para o `str()` (`str($value)`); sem argumento ele devolve um objeto não tipado
 - a exceção são as macros: registre e chame macros pela classe (`Str::macro('acronym', ...)`, `Str::acronym(...)` dentro de outra macro)
@@ -59,6 +59,7 @@ Ex.
 /src/Resources/Articles/ArticleResource.php
 /src/Services/ArticleService.php
 /src/ArticlesPlugin.php
+/tests/Feature/Services/ArticleServiceTest.php
 
 O conteúdo detalhado de cada arquivo (exemplos de código, tabelas de campos) está nas skills, carregadas sob demanda conforme a tarefa:
 - `creating-filament-admix-package` — scaffold completo de um pacote novo (config, factory, migration, seeder, lang, Model, ServiceProviders, Pages, Resource, Service, Plugin)
