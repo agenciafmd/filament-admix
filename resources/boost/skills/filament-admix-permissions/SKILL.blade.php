@@ -1,6 +1,6 @@
 ---
 name: filament-admix-permissions
-description: 'Use this skill whenever working with access control in the admix panel — Grupos (roles), `role_id`, administrators, the generic `ResourcePolicy`, the `PermissionRegistry`, custom record/header actions that need their own permission (`getExtraPermissions()` + `->authorize()`), a package-specific Policy, the Horizon gate, or tests that act as a restricted user. Do not use it for the Form/Table layout itself (see `filament-admix-form-fields` / `filament-admix-table-conventions`) or for scaffolding a whole new package (see `creating-filament-admix-package`).'
+description: 'Use this skill whenever working with access control in the admix panel — Grupos (roles), `role_id`, administrators, the generic `ResourcePolicy`, the `PermissionRegistry`, custom record/header actions that need their own permission (`getExtraPermissions()` + `->authorize()`), a package-specific Policy, or tests that act as a restricted user. Do not use it for the Form/Table layout itself (see `filament-admix-form-fields` / `filament-admix-table-conventions`) or for scaffolding a whole new package (see `creating-filament-admix-package`).'
 license: MIT
 metadata:
     author: agenciafmd
@@ -107,16 +107,6 @@ Se o pacote precisar de uma regra que não cabe nas abilities (ex.: só o autor 
 `Gate::policy()` no ServiceProvider do pacote. O admix **não** sobrescreve policies existentes — nesse caso a Policy do
 pacote é responsável por todas as checagens (inclusive administrador e `hasPermission()`), então prefira as abilities
 extras sempre que possível.
-
-## Horizon
-
-O dashboard do Horizon usa o guard do admix, mas não passa pelos Grupos. Um gate `viewHorizon` que devolve `true`
-libera o Horizon para qualquer usuário de grupo restrito. Restrinja aos administradores no
-`app/Providers/HorizonServiceProvider.php`, com o `User` do admix (`Agenciafmd\Admix\Models\User`):
-
-@boostsnippet('Example of the viewHorizon gate', 'php')
-Gate::define('viewHorizon', static fn (?User $user = null): bool => $user instanceof User && $user->isAdmin());
-@endboostsnippet
 
 ## Testes
 
