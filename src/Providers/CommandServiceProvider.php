@@ -31,13 +31,12 @@ final class CommandServiceProvider extends ServiceProvider
             $schedule = $this->app->make(Schedule::class);
             $minutes = config()->string('filament-admix.schedule.minutes', '00');
 
-            if (config()->boolean('filament-admix.queue.enabled')) {
+            if (config()->boolean('filament-admix.queue.enabled') && (config()->string('queue.default') !== 'sync')) {
                 $schedule->command('queue:work --tries=3 --delay=5 --timeout=60 --max-time=600 --queue=high,default,low')
                     ->name(now()->format('H:i') . ' Rotina de processamento de fila')
                     ->runInBackground()
                     ->withoutOverlapping(15)
-                    ->everyMinute()
-                    ->appendOutputTo(storage_path('logs/command-queue-work-' . today()->format('Y-m-d') . '.log'));
+                    ->everyMinute();
             }
 
             $schedule->command('auth:clear-resets')
