@@ -31,21 +31,29 @@ final class CommandServiceProvider extends ServiceProvider
             $schedule = $this->app->make(Schedule::class);
             $minutes = config()->string('filament-admix.schedule.minutes', '00');
 
+            if (config()->boolean('filament-admix.queue.enabled')) {
+                $schedule->command('queue:work --tries=3 --delay=5 --timeout=60 --max-time=600 --queue=high,default,low')
+                    ->name(now()->format('H:i') . ' Rotina de processamento de fila')
+                    ->runInBackground()
+                    ->withoutOverlapping(15)
+                    ->everyMinute()
+                    ->appendOutputTo(storage_path('logs/command-queue-work-' . today()->format('Y-m-d') . '.log'));
+            }
+
             $schedule->command('auth:clear-resets')
                 ->everyFifteenMinutes();
             $schedule->command('clockwork:clean')
                 ->before(function (): void {
                     $storagePath = config('clockwork.storage_files_path');
 
-                    if (config('clockwork.storage') !== 'files' || ! is_string($storagePath)) {
+                    if (! is_string($storagePath) || config('clockwork.storage') !== 'files') {
                         return;
                     }
 
                     $path = $storagePath . '/index';
-                    $content = '';
                     if (! File::exists($path)) {
                         File::ensureDirectoryExists(dirname($path));
-                        File::put($path, $content);
+                        File::put($path, '');
                     }
                 })
                 ->withoutOverlapping()

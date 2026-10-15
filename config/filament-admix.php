@@ -11,6 +11,9 @@ return [
     'timestamp' => [
         'format' => env('ADMIX_TIMESTAMP_FORMAT', 'd/m/Y H:i:s'),
     ],
+    'queue' => [
+        'enabled' => env('ADMIX_QUEUE_ENABLED', true),
+    ],
     /*
      * Local environment only: logs in automatically on the admix panel.
      * Use an e-mail to log in as that user, or true for the first active administrator.
