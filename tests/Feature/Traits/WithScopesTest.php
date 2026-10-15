@@ -8,7 +8,7 @@ use Agenciafmd\Admix\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-uses(TestCase::class, RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 it('keeps only the active records', function (): void {
     $activeRole = Role::factory()->create();

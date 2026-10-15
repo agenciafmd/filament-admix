@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 use function Pest\Laravel\get;
 
-uses(TestCase::class, RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 beforeEach(function (): void {
     app()->detectEnvironment(fn (): string => 'local');

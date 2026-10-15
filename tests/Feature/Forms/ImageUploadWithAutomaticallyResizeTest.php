@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 use function Pest\Laravel\actingAs;
 
-uses(TestCase::class, RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 beforeEach(function (): void {
     actingAs(User::factory()->create()->fresh(), 'admix-web');

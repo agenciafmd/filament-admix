@@ -27,7 +27,7 @@ use Tests\TestCase;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
-uses(TestCase::class, RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 function articlePermission(string $ability): string
 {
