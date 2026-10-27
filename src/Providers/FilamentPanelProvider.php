@@ -9,6 +9,7 @@ use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
 use Agenciafmd\Admix\Policies\ResourcePolicy;
 use Agenciafmd\Admix\Resources\Auth\Pages\EditProfile;
+use Agenciafmd\Admix\Resources\Auth\Pages\Login;
 use Filament\Contracts\Plugin;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -74,7 +75,7 @@ final class FilamentPanelProvider extends PanelProvider
             ->default()
             ->id('admix')
             ->path('admix')
-            ->login()
+            ->login(Login::class)
             ->passwordReset()
 //            ->emailVerification() // TODO
 //            ->emailChangeVerification() // TODO
