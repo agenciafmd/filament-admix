@@ -166,8 +166,9 @@ it('drops unknown permission keys when saving the role', function (): void {
 it('renders the permission matrix on the role form', function (): void {
     actingAsAdmixUser();
 
-    get(RoleResource::getUrl('create'))
-        ->assertOk()
+    Livewire::test(CreateRole::class)
+        ->call('loadDeferredSchema', 'form.permissions')
+        ->call('$refresh')
         ->assertSee(ArticleResource::getPluralModelLabel())
         ->assertSee(__('send'));
 });
@@ -190,7 +191,7 @@ it('does not let users change their own role', function (): void {
     $user = actingAsAdmixUser();
 
     Livewire::test(EditUser::class, ['record' => $user->getRouteKey()])
-        ->assertFormFieldDisabled('role_id');
+        ->assertFormFieldDisabled('general.role_id');
 });
 
 it('checks the extra abilities declared by the resource', function (): void {

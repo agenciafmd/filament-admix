@@ -350,6 +350,29 @@ diz o que é.
 - as seções "Geral" (`__('General')`) e "Informações" (`__('Information')`) **não** usam lazy loading: recebem só a
   `->key()` e continuam com o array no `->schema([...])`
 - `Schema` é `Filament\Schemas\Schema` (o mesmo do `configure()`)
+- a key da Section entra como prefixo na key dos campos filhos: nos testes, use `'general.role_id'` em
+  `assertFormFieldExists()`/`assertFormFieldDisabled()`/`assertFormFieldDoesNotExist()`, e não só `'role_id'`. O
+  `statePath` (nome do campo no `fillForm()`/`assertHasFormErrors()`) não muda
+- quando os campos dependem de `Get $get`, a closure fica no `->schema()` da Section e devolve o `Schema` lazy; a
+  closure dentro do `Schema::make()->components()` não recebe o `Get`
+- para testar o conteúdo lazy, carregue o schema antes:
+  `Livewire::test(CreateRole::class)->call('loadDeferredSchema', 'form.permissions')->call('$refresh')->assertSee(...)`
+
+@boostsnippet('Example content of a lazy loaded section with dynamic fields', 'php')
+Section::make(__('Additional fields'))
+    ->key('additionalFields')
+    ->statePath('meta')
+    ->schema(static fn (Get $get): Schema => Schema::make()
+        ->components(BannerService::make()
+            ->meta(self::location($get))
+            ->map(static fn (array $field): TextInput => TextInput::make($field['name'])
+                ->label($field['label']))
+            ->all())
+        ->lazyLoaded())
+    ->collapsible()
+    ->columns()
+    ->columnSpan(2),
+@endboostsnippet
 
 @boostsnippet('Example content of a lazy loaded section', 'php')
 Section::make(__('Customer details'))

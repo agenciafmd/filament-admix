@@ -23,7 +23,7 @@ beforeEach(function (): void {
 
 it('resizes the image to integer dimensions and shows them in the label', function (): void {
     Livewire::test(CreateUser::class)
-        ->assertFormFieldExists('avatar', static fn (FileUpload $field): bool => $field->getAutomaticallyResizeImagesWidth() === '500'
+        ->assertFormFieldExists('information.avatar', static fn (FileUpload $field): bool => $field->getAutomaticallyResizeImagesWidth() === '500'
             && $field->getAutomaticallyResizeImagesHeight() === '500')
         ->assertSee('Max. 500x500');
 });
