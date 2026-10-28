@@ -18,6 +18,10 @@ Formulário do resource de articles.
   `published_at`, `created_at` e `updated_at`, caso sejam solicitados
 - seções extras (relacionamentos, repeaters, imagens, vídeo) entram no primeiro `Group`, depois de "Geral", cada uma
   com `->collapsible()->columns()->columnSpan(2)`; veja [Seções extras](#seções-extras)
+- toda `Section::make()` recebe `->key()` com o nome da seção em camelCase (`__('General')` → `'general'`,
+  `__('Customer details')` → `'customerDetails'`); a key precisa ser única no formulário
+- o conteúdo de toda seção é carregado sob demanda (lazy loading), exceto o de "Geral" e o de "Informações"; veja
+  [Lazy loading das seções](#lazy-loading-das-seções)
 
 @boostsnippet('Example content of ArticleForm', 'php')
 <?php
@@ -54,6 +58,7 @@ final class ArticleForm
                     ->schema([
                         Group::make([
                             Section::make(__('General'))
+                                ->key('general')
                                 ->schema([
                                     TextInput::make('title')
                                         ->translateLabel()
@@ -90,28 +95,38 @@ final class ArticleForm
                                 ->columns()
                                 ->columnSpan(2),
                             Section::make(__('Images'))
-                                ->schema([
-                                    ImageUploadMultipleWithAutomaticallyResize::make(
-                                        name: 'images',
-                                        directory: 'article/images',
-                                        fileNameField: 'title',
-                                    )
-                                        ->hiddenLabel(),
-                                ])
+                                ->key('images')
+                                ->schema(
+                                    Schema::make()
+                                        ->components([
+                                            ImageUploadMultipleWithAutomaticallyResize::make(
+                                                name: 'images',
+                                                directory: 'article/images',
+                                                fileNameField: 'title',
+                                            )
+                                                ->hiddenLabel(),
+                                        ])
+                                        ->lazyLoaded(),
+                                )
                                 ->collapsible()
                                 ->columns()
                                 ->columnSpan(2),
                             Section::make(__('Video'))
+                                ->key('video')
                                 ->afterHeader([
                                     Text::make('Ex. https://youtu.be/aZ6cPPL3QEU')
                                         ->size(TextSize::Small),
                                 ])
-                                ->schema([
-                                    YouTubeInput::make()
-                                        ->hiddenLabel()
-                                        ->belowContent('')
-                                        ->columnSpanFull(),
-                                ])
+                                ->schema(
+                                    Schema::make()
+                                        ->components([
+                                            YouTubeInput::make()
+                                                ->hiddenLabel()
+                                                ->belowContent('')
+                                                ->columnSpanFull(),
+                                        ])
+                                        ->lazyLoaded(),
+                                )
                                 ->collapsible()
                                 ->columns()
                                 ->columnSpan(2),
@@ -119,6 +134,7 @@ final class ArticleForm
                             ->columnSpan(2),
                         Group::make([
                             Section::make(__('Information'))
+                                ->key('information')
                                 ->schema([
                                     Toggle::make('is_active')
                                         ->translateLabel()
@@ -196,16 +212,21 @@ Em Section própria, com o exemplo de URL no `afterHeader` e o campo com `->hidd
 
 @boostsnippet('Example content of video field', 'php')
 Section::make(__('Video'))
+    ->key('video')
     ->afterHeader([
         Text::make('Ex. https://youtu.be/aZ6cPPL3QEU')
             ->size(TextSize::Small),
     ])
-    ->schema([
-        YouTubeInput::make()
-            ->hiddenLabel()
-            ->belowContent('')
-            ->columnSpanFull(),
-    ])
+    ->schema(
+        Schema::make()
+            ->components([
+                YouTubeInput::make()
+                    ->hiddenLabel()
+                    ->belowContent('')
+                    ->columnSpanFull(),
+            ])
+            ->lazyLoaded(),
+    )
     ->collapsible()
     ->columns()
     ->columnSpan(2),
@@ -244,14 +265,19 @@ ImageUploadWithAutomaticallyResize::make(name: 'image', directory: 'category/ima
 
 @boostsnippet('Example content of images field', 'php')
 Section::make(__('Images'))
-    ->schema([
-        ImageUploadMultipleWithAutomaticallyResize::make(
-            name: 'images',
-            directory: 'article/images',
-            fileNameField: 'title',
-        )
-            ->hiddenLabel(),
-    ])
+    ->key('images')
+    ->schema(
+        Schema::make()
+            ->components([
+                ImageUploadMultipleWithAutomaticallyResize::make(
+                    name: 'images',
+                    directory: 'article/images',
+                    fileNameField: 'title',
+                )
+                    ->hiddenLabel(),
+            ])
+            ->lazyLoaded(),
+    )
     ->collapsible()
     ->columns()
     ->columnSpan(2),
@@ -287,17 +313,22 @@ Em Section própria, com o nome do relacionamento no título e o campo com `->hi
 
 @boostsnippet('Example content of belongsToMany relationship field', 'php')
 Section::make(__('Categories'))
-    ->schema([
-        CheckboxList::make('categories')
-            ->translateLabel()
-            ->hiddenLabel()
-            ->relationship('categories', 'name')
-            ->searchable()
-            ->bulkToggleable()
-            ->columns(3)
-            ->gridDirection(GridDirection::Row)
-            ->columnSpanFull(),
-    ])
+    ->key('categories')
+    ->schema(
+        Schema::make()
+            ->components([
+                CheckboxList::make('categories')
+                    ->translateLabel()
+                    ->hiddenLabel()
+                    ->relationship('categories', 'name')
+                    ->searchable()
+                    ->bulkToggleable()
+                    ->columns(3)
+                    ->gridDirection(GridDirection::Row)
+                    ->columnSpanFull(),
+            ])
+            ->lazyLoaded(),
+    )
     ->collapsible()
     ->columns()
     ->columnSpan(2),
@@ -309,6 +340,36 @@ Relacionamentos, repeaters, imagens e vídeo ficam em `Section` própria dentro 
 `->collapsible()->columns()->columnSpan(2)`. O campo dentro dela usa `->hiddenLabel()`, porque o título da Section já
 diz o que é.
 
+## Lazy loading das seções
+
+- toda `Section::make()` tem `->key()` com o nome da seção em camelCase, logo depois do `make()`
+- o conteúdo das seções carrega sob demanda: passe um `Schema::make()->components([...])->lazyLoaded()` para o
+  `->schema()` no lugar do array. O cabeçalho da seção renderiza na hora e os campos só carregam quando a seção entra
+  na tela
+- o schema lazy herda a key da Section, por isso a key é obrigatória e precisa ser única no formulário
+- as seções "Geral" (`__('General')`) e "Informações" (`__('Information')`) **não** usam lazy loading: recebem só a
+  `->key()` e continuam com o array no `->schema([...])`
+- `Schema` é `Filament\Schemas\Schema` (o mesmo do `configure()`)
+
+@boostsnippet('Example content of a lazy loaded section', 'php')
+Section::make(__('Customer details'))
+    ->key('customerDetails')
+    ->schema(
+        Schema::make()
+            ->components([
+                TextInput::make('name')
+                    ->translateLabel(),
+                TextInput::make('email')
+                    ->translateLabel()
+                    ->email(),
+            ])
+            ->lazyLoaded(),
+    )
+    ->collapsible()
+    ->columns()
+    ->columnSpan(2),
+@endboostsnippet
+
 ### Repeater em tabela
 
 - `->table([TableColumn::make(...)->markAsRequired()])` com uma coluna por campo (`->markAsRequired()` nas obrigatórias)
@@ -318,26 +379,31 @@ diz o que é.
 
 @boostsnippet('Example content of a table repeater', 'php')
 Section::make(__('Preparation'))
-    ->schema([
-        Repeater::make('instructions')
-            ->translateLabel()
-            ->hiddenLabel()
-            ->table([
-                TableColumn::make(__('Step'))
-                    ->markAsRequired(),
+    ->key('preparation')
+    ->schema(
+        Schema::make()
+            ->components([
+                Repeater::make('instructions')
+                    ->translateLabel()
+                    ->hiddenLabel()
+                    ->table([
+                        TableColumn::make(__('Step'))
+                            ->markAsRequired(),
+                    ])
+                    ->simple(
+                        TextInput::make('step')
+                            ->label(__('Step'))
+                            ->minLength(3)
+                            ->maxLength(255)
+                            ->required(),
+                    )
+                    ->compact()
+                    ->addActionLabel(__('Add step'))
+                    ->minItems(1)
+                    ->columnSpanFull(),
             ])
-            ->simple(
-                TextInput::make('step')
-                    ->label(__('Step'))
-                    ->minLength(3)
-                    ->maxLength(255)
-                    ->required(),
-            )
-            ->compact()
-            ->addActionLabel(__('Add step'))
-            ->minItems(1)
-            ->columnSpanFull(),
-    ])
+            ->lazyLoaded(),
+    )
     ->collapsible()
     ->columns()
     ->columnSpan(2),
@@ -349,36 +415,41 @@ Cada item tem `name` e um `FileUploadWithDefault` com `->previewable(false)->dow
 
 @boostsnippet('Example content of a files repeater', 'php')
 Section::make(__('Files'))
-    ->schema([
-        Repeater::make('files')
-            ->translateLabel()
-            ->hiddenLabel()
-            ->table([
-                TableColumn::make(__('Name'))
-                    ->markAsRequired()
-                    ->width('20rem'),
-                TableColumn::make(__('File'))
-                    ->markAsRequired(),
-            ])
-            ->schema([
-                TextInput::make('name')
+    ->key('files')
+    ->schema(
+        Schema::make()
+            ->components([
+                Repeater::make('files')
+                    ->translateLabel()
                     ->hiddenLabel()
-                    ->minLength(3)
-                    ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->required(),
-                FileUploadWithDefault::make(name: 'file', directory: 'material/file')
-                    ->hiddenLabel()
-                    ->previewable(false)
-                    ->downloadable()
-                    ->openable()
-                    ->required(),
+                    ->table([
+                        TableColumn::make(__('Name'))
+                            ->markAsRequired()
+                            ->width('20rem'),
+                        TableColumn::make(__('File'))
+                            ->markAsRequired(),
+                    ])
+                    ->schema([
+                        TextInput::make('name')
+                            ->hiddenLabel()
+                            ->minLength(3)
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->required(),
+                        FileUploadWithDefault::make(name: 'file', directory: 'material/file')
+                            ->hiddenLabel()
+                            ->previewable(false)
+                            ->downloadable()
+                            ->openable()
+                            ->required(),
+                    ])
+                    ->compact()
+                    ->addActionLabel(__('Add file'))
+                    ->minItems(1)
+                    ->columnSpanFull(),
             ])
-            ->compact()
-            ->addActionLabel(__('Add file'))
-            ->minItems(1)
-            ->columnSpanFull(),
-    ])
+            ->lazyLoaded(),
+    )
     ->collapsible()
     ->columns()
     ->columnSpan(2),
