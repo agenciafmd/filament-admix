@@ -20,6 +20,7 @@ final class EditProfile extends BaseEditProfile
             ->inlineLabel(false)
             ->components([
                 Section::make(__('General'))
+                    ->key('general')
                     ->schema([
                         TextInput::make('name')
                             ->translateLabel()
@@ -46,6 +47,7 @@ final class EditProfile extends BaseEditProfile
                     ->columns()
                     ->columnSpan(2),
                 Section::make(__('Information'))
+                    ->key('information')
                     ->schema([
                         DateTimeEntry::make('created_at'),
                         DateTimeEntry::make('updated_at'),

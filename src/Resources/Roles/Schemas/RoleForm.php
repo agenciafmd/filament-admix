@@ -23,6 +23,7 @@ final class RoleForm
                     ->schema([
                         Group::make([
                             Section::make(__('General'))
+                                ->key('general')
                                 ->schema([
                                     TextInput::make('name')
                                         ->translateLabel()
@@ -37,6 +38,7 @@ final class RoleForm
                             ->columnSpan(2),
                         Group::make([
                             Section::make(__('Information'))
+                                ->key('information')
                                 ->schema([
                                     Toggle::make('is_active')
                                         ->translateLabel()
@@ -49,10 +51,15 @@ final class RoleForm
                                 ->collapsible(),
                         ]),
                         Section::make(__('Permissions'))
-                            ->schema([
-                                PermissionMatrix::make('permissions')
-                                    ->hiddenLabel(),
-                            ])
+                            ->key('permissions')
+                            ->schema(
+                                Schema::make()
+                                    ->components([
+                                        PermissionMatrix::make('permissions')
+                                            ->hiddenLabel(),
+                                    ])
+                                    ->lazyLoaded(),
+                            )
                             ->collapsible()
                             ->columnSpanFull(),
                     ])
