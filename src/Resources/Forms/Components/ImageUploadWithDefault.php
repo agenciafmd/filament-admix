@@ -18,7 +18,7 @@ final class ImageUploadWithDefault
         string $directory,
         string $fileNameField = 'name',
     ): FileUpload {
-        $upload = FileUploadWithDefault::make(
+        return FileUploadWithDefault::make(
             name: $name,
             directory: $directory,
             fileNameField: $fileNameField,
@@ -33,7 +33,5 @@ final class ImageUploadWithDefault
             ->imageEditorViewportWidth(1920)
             ->imageEditorViewportHeight(1080)
             ->imageEditor();
-
-        return $upload;
     }
 }
