@@ -34,8 +34,6 @@ final class ImageUploadWithDefault
             ->imageEditorViewportHeight(1080)
             ->imageEditor();
 
-        $upload->optimize(format: 'jpg', quality: 95);
-
         return $upload;
     }
 }
