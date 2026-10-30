@@ -19,6 +19,8 @@
     "row": "linha",
     "The :attribute must be a YouTube url.": "O :attribute deve ser uma url do YouTube.",
     "YouTube Video URL": "Url do vídeo no YouTube",
+    "The :attribute must be a YouTube or Instagram reel url.": "O :attribute deve ser uma url do YouTube ou de um reel do Instagram.",
+    "Video URL (YouTube or Instagram Reel)": "Url do vídeo (YouTube ou Reel do Instagram)",
     "Slug": "Nome amigável (slug)",
     "Sort": "Ordenação",
     "Disable reordering": "Salvar",
