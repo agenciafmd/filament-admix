@@ -39,8 +39,13 @@ final class CommandServiceProvider extends ServiceProvider
                     ->everyMinute();
             }
 
+            if (in_array(config('session.driver'), ['file', 'database'], true)) {
+                $schedule->command('session:garbage-collect')
+                    ->hourly();
+            }
+
             $schedule->command('auth:clear-resets')
-                ->everyFifteenMinutes();
+                ->hourly();
             $schedule->command('clockwork:clean')
                 ->before(function (): void {
                     $storagePath = config('clockwork.storage_files_path');
