@@ -29,8 +29,17 @@ final readonly class ResourcePolicy
             return true;
         }
 
+        if ($this->registry->isAdministratorsOnly($model)) {
+            return false;
+        }
+
         // Only administrators can change administrators.
         if ($model instanceof User && $model->isAdmin() && ! in_array($ability, ['viewAny', 'view'], true)) {
+            return false;
+        }
+
+        // Users shared with other teams can only be seen or removed from the current team.
+        if ($model instanceof User && $model->belongsToOtherTeams() && ! in_array($ability, ['viewAny', 'view', 'delete'], true)) {
             return false;
         }
 

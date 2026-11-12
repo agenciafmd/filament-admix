@@ -8,6 +8,7 @@ A ideia principal é facilitar os CRUDS dos recursos mais comuns em aplicações
 - Usuários: cria usuários para acesso ao painel administrativo (admix).
 - Auditoria: registra ações realizadas no sistema, permitindo a restauração dos dados.
 - Grupos: controle de permissões automático por Resource (usuário sem grupo é administrador); nenhum pacote precisa de Policy ou config para isso.
+- Equipes (opcional, `filament-admix.tenancy.enabled`): cada usuário vê só as suas equipes; administradores veem todas. Models de pacote usam o trait `BelongsToTeam` (detalhes na skill `filament-admix-permissions`).
 
 ### Estrutura para criação de novos recursos / pacotes
 

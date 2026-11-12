@@ -101,6 +101,39 @@ Regras:
   padrão "pode {label}" das abilities padrão
 - a action continua usando `->visible()`/`->hidden()` para regras de negócio; `->authorize()` é só para permissão
 
+## Resource só para administradores: `isAdministratorsOnly()`
+
+O Resource que declara `public static function isAdministratorsOnly(): bool` retornando `true` fica restrito aos
+administradores e sai da matriz de permissões dos Grupos. O admix usa isso em `TeamResource` (sempre) e em
+`RoleResource` (com a tenancy ligada).
+
+## Equipes (tenancy)
+
+A tenancy usa a tenancy nativa do Filament e vem desligada (`filament-admix.tenancy.enabled`, env `ADMIX_TENANCY`).
+Com ela desligada, nada muda. Ligada:
+
+- **URLs:** ficam `/admix/{team:slug}/...`; o model é `Agenciafmd\Admix\Models\Team` e o vínculo é muitos-para-muitos
+  (`team_user`, `$user->teams()`);
+- **administrador** (sem grupo) acessa todas as equipes e gerencia Equipes e Grupos;
+- **demais usuários:** acessam só as suas equipes ativas, sempre com um grupo, que vale em todas as equipes dele.
+  Sem equipe ativa, não entram no painel;
+- **Usuários:**
+  - a lista mostra os usuários da equipe atual;
+  - criar com um e-mail existente vincula esse usuário à equipe;
+  - quem não é administrador não altera um usuário que está em outras equipes;
+  - deletar remove o usuário da equipe e só o exclui quando ele não tem mais nenhuma equipe;
+- **models de pacote** que pertencem a uma equipe:
+  - recebem a coluna `team_id` (`foreignId('team_id')->constrained('teams')->cascadeOnDelete()`) e o trait
+    `Agenciafmd\Admix\Traits\BelongsToTeam`;
+  - o trait cria a relação `team()`, filtra as consultas pela equipe atual (`Filament::getTenant()`) e preenche o
+    `team_id` ao criar;
+  - fora do painel (jobs, exports, rotas públicas), defina a equipe com `Filament::setTenant($team)` antes das consultas;
+- **Resource sem equipe** (dado global): declare `protected static bool $isScopedToTenant = false;`;
+- **regras `unique`/`exists`:** ignoram os escopos do Eloquent. Num model com equipe, use `scopedUnique()` /
+  `scopedExists()` do Filament;
+- **testes com a tenancy ligada:** a config precisa valer antes do boot (as rotas mudam). Veja
+  `tests/Feature/Tenancy/TenancyTest.php`, que estende o TestCase com `$app->booting(...)`.
+
 ## Policy própria
 
 Se o pacote precisar de uma regra que não cabe nas abilities (ex.: só o autor edita), crie a Policy e registre com

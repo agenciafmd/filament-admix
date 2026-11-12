@@ -19,6 +19,13 @@ return [
      * Use an e-mail to log in as that user, or true for the first active administrator.
      */
     'auto_login' => env('ADMIX_AUTO_LOGIN', true),
+    /*
+     * Teams (multi-tenant): each user only sees the teams they belong to.
+     * Administrators (users without a role) access every team.
+     */
+    'tenancy' => [
+        'enabled' => env('ADMIX_TENANCY', false),
+    ],
     'plugins' => [
         //        ArticlesPlugin::class,
     ],

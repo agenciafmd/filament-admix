@@ -85,6 +85,19 @@ final class PermissionRegistry
     }
 
     /**
+     * Resources may declare `public static function isAdministratorsOnly(): bool`. When it returns
+     * true, only administrators access the resource and it is left out of the role permissions.
+     */
+    public function isAdministratorsOnly(Model|string $model): bool
+    {
+        $resource = $this->resourceFor($model);
+
+        return $resource !== null
+            && method_exists($resource, 'isAdministratorsOnly')
+            && $resource::isAdministratorsOnly() === true;
+    }
+
+    /**
      * @param  class-string<FilamentResource>  $resource
      * @return array<string, string> ability => label
      */
@@ -156,6 +169,7 @@ final class PermissionRegistry
     public function groups(): array
     {
         return collect($this->resourcesByModel())
+            ->reject(fn (string $resource, string $model): bool => $this->isAdministratorsOnly($model))
             ->values()
             ->sortBy(fn (string $resource): string => sprintf(
                 '%s|%05d|%s',

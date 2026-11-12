@@ -38,5 +38,9 @@
     "restore": "restaurar",
     "audit": "auditoria",
     "Resource": "Recurso",
-    "Others": "Outros"
+    "Others": "Outros",
+    "Team": "Equipe",
+    "Teams": "Equipes",
+    "New team": "Nova equipe",
+    "Used in the panel address.": "Usado no endereço do painel."
 }

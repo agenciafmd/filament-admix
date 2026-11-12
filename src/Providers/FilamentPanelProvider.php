@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Agenciafmd\Admix\Providers;
 
 use Agenciafmd\Admix\Http\Middleware\AutoLogin;
+use Agenciafmd\Admix\Models\Team;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
 use Agenciafmd\Admix\Policies\ResourcePolicy;
 use Agenciafmd\Admix\Resources\Auth\Pages\EditProfile;
 use Agenciafmd\Admix\Resources\Auth\Pages\Login;
+use Agenciafmd\Admix\Resources\Teams\Pages\RegisterTeam;
 use Filament\Contracts\Plugin;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -132,6 +134,9 @@ final class FilamentPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->when(Team::isTenancyEnabled(), static fn (Panel $panel): Panel => $panel
+                ->tenant(Team::class, slugAttribute: 'slug')
+                ->tenantRegistration(RegisterTeam::class))
             ->viteTheme('resources/filament/filament-admix/css/theme.css', 'filament-admix');
     }
 

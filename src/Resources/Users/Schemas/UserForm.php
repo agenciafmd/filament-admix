@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Schemas;
 
+use Agenciafmd\Admix\Models\Team;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize;
 use Agenciafmd\Admix\Resources\Forms\Components\PasswordInput;
@@ -16,6 +17,9 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Operation;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
 final class UserForm
 {
@@ -40,7 +44,11 @@ final class UserForm
                                         ->rules([
                                             'email:rfc,dns',
                                         ])
-                                        ->unique(ignoreRecord: true)
+                                        // With the tenancy enabled, an existing e-mail adds that user to the team (CreateUser).
+                                        ->rule(
+                                            static fn (?User $record): Unique => Rule::unique(User::class, 'email')->ignore($record),
+                                            static fn (string $operation): bool => ! Team::isTenancyEnabled() || $operation !== Operation::Create->value,
+                                        )
                                         ->live(onBlur: true)
                                         ->afterStateUpdated(fn (Page $livewire) => $livewire->validateOnly('data.email'))
                                         ->required(),

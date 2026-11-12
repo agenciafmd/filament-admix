@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Pages;
 
+use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
 use Agenciafmd\Admix\Resources\Users\UserResource;
+use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 use Override;
 
 /**
@@ -19,4 +23,37 @@ final class CreateUser extends CreateRecord
 
     #[Override]
     protected static string $resource = UserResource::class;
+
+    /**
+     * With the tenancy enabled, the user joins the current team. An e-mail that already
+     * exists adds that user to the team, without changing their data.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    #[Override]
+    protected function handleRecordCreation(array $data): Model
+    {
+        $team = Filament::getTenant();
+
+        if (! Team::isTenancyEnabled() || ! $team instanceof Team) {
+            return parent::handleRecordCreation($data);
+        }
+
+        $user = User::query()
+            ->withTrashed()
+            ->where('email', $data['email'] ?? null)
+            ->first();
+
+        if ($user?->trashed()) {
+            $user->restore();
+        }
+
+        $user ??= parent::handleRecordCreation($data);
+
+        if ($user instanceof User) {
+            $user->teams()->syncWithoutDetaching([$team->getKey()]);
+        }
+
+        return $user;
+    }
 }

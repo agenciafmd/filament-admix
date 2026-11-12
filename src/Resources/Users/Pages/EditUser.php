@@ -45,7 +45,8 @@ final class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->using(fn (User $record): bool => UserResource::deleteRecord($record)),
         ];
     }
 }

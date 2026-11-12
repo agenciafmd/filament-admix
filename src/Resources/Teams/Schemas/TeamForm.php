@@ -1,0 +1,83 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Agenciafmd\Admix\Resources\Teams\Schemas;
+
+use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+
+final class TeamForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Grid::make(3)
+                    ->schema([
+                        Group::make([
+                            Section::make(__('General'))
+                                ->key('general')
+                                ->schema(self::fields())
+                                ->collapsible()
+                                ->columns()
+                                ->columnSpan(2),
+                        ])
+                            ->columnSpan(2),
+                        Group::make([
+                            Section::make(__('Information'))
+                                ->key('information')
+                                ->schema([
+                                    Toggle::make('is_active')
+                                        ->translateLabel()
+                                        ->default(true)
+                                        ->columnSpanFull(),
+                                    DateTimeEntry::make('created_at'),
+                                    DateTimeEntry::make('updated_at'),
+                                ])
+                                ->columns()
+                                ->collapsible(),
+                        ]),
+                    ])
+                    ->columnSpanFull(),
+            ]);
+    }
+
+    /**
+     * Fields shared with the team registration page.
+     *
+     * @return array<int, TextInput|Select>
+     */
+    public static function fields(): array
+    {
+        return [
+            TextInput::make('name')
+                ->translateLabel()
+                ->autofocus()
+                ->minLength(3)
+                ->maxLength(255)
+                ->generateSlug()
+                ->required(),
+            TextInput::make('slug')
+                ->translateLabel()
+                ->helperText(__('Used in the panel address.'))
+                ->alphaDash()
+                ->maxLength(255)
+                ->unique(ignoreRecord: true)
+                ->required(),
+            Select::make('users')
+                ->label(__('Users'))
+                ->relationship('users', 'name')
+                ->multiple()
+                ->searchable()
+                ->preload()
+                ->columnSpanFull(),
+        ];
+    }
+}
