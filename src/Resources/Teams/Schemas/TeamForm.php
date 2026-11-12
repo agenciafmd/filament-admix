@@ -78,7 +78,6 @@ final class TeamForm
                 ->required(),
             TextInput::make('slug')
                 ->translateLabel()
-                ->helperText(__('Also names the subdomain of the team.'))
                 ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')
                 ->notIn(Team::reservedSlugs())
                 ->maxLength(63)
