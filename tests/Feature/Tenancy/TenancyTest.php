@@ -14,43 +14,24 @@ use Agenciafmd\Admix\Resources\Users\Pages\CreateUser;
 use Agenciafmd\Admix\Resources\Users\Pages\EditUser;
 use Agenciafmd\Admix\Resources\Users\Pages\ListUsers;
 use Agenciafmd\Admix\Resources\Users\UserResource;
+use Agenciafmd\Admix\Testing\WithTenancy;
 use Agenciafmd\Admix\Traits\BelongsToTeam;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Facades\Filament;
 use Filament\Pages\Dashboard;
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
-use Override;
 use Tests\TestCase;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
-
-/**
- * The panel routes depend on the tenancy, so it is enabled before the application boots.
- */
-abstract class TenancyTestCase extends TestCase
-{
-    #[Override]
-    final public function createApplication(): Application
-    {
-        $app = require Application::inferBasePath() . '/bootstrap/app.php';
-
-        $app->booting(static fn () => config(['filament-admix.tenancy.enabled' => true]));
-        $app->make(Kernel::class)->bootstrap();
-
-        return $app;
-    }
-}
 
 #[Unguarded]
 final class TeamNote extends Model
@@ -59,7 +40,7 @@ final class TeamNote extends Model
     use HasFactory;
 }
 
-pest()->extend(TenancyTestCase::class)->use(RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class, WithTenancy::class);
 
 /**
  * @param  array<int, string>|null  $permissions  null creates an administrator

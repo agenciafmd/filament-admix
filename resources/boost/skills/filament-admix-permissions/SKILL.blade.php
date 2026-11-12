@@ -131,8 +131,13 @@ Com ela desligada, nada muda. Ligada:
 - **Resource sem equipe** (dado global): declare `protected static bool $isScopedToTenant = false;`;
 - **regras `unique`/`exists`:** ignoram os escopos do Eloquent. Num model com equipe, use `scopedUnique()` /
   `scopedExists()` do Filament;
-- **testes com a tenancy ligada:** a config precisa valer antes do boot (as rotas mudam). Veja
-  `tests/Feature/Tenancy/TenancyTest.php`, que estende o TestCase com `$app->booting(...)`.
+- a `ResourcePolicy` também confere a equipe: quem não é administrador só acessa registros com `team_id` de uma
+  equipe sua, mesmo fora do escopo do painel (callbacks, jobs);
+- **exportações** rodam num job, sem a equipe atual: filtre a equipe explicitamente no `modifyQuery()` do Exporter;
+- **rotas públicas** não têm equipe atual: grave o `team_id` a partir do registro de origem (ex.: o lead herda a
+  equipe da página);
+- **testes com a tenancy ligada:** a config precisa valer antes do boot (as rotas mudam). Use o trait
+  `Agenciafmd\Admix\Testing\WithTenancy` no teste (`pest()->use(WithTenancy::class)`).
 
 ## Policy própria
 

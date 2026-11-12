@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Policies;
 
+use Agenciafmd\Admix\Models\Team;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
+use Agenciafmd\Admix\Traits\BelongsToTeam;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -30,6 +32,10 @@ final readonly class ResourcePolicy
         }
 
         if ($this->registry->isAdministratorsOnly($model)) {
+            return false;
+        }
+
+        if ($model instanceof Model && ! $this->belongsToUserTeams($user, $model)) {
             return false;
         }
 
@@ -119,6 +125,21 @@ final readonly class ResourcePolicy
     public function restoreAudit(): bool
     {
         return false;
+    }
+
+    /**
+     * With the tenancy enabled, records of models with `BelongsToTeam` are only reachable
+     * by members of their team, even outside the panel scope (callbacks, jobs).
+     */
+    private function belongsToUserTeams(User $user, Model $model): bool
+    {
+        if (! Team::isTenancyEnabled() || ! in_array(BelongsToTeam::class, class_uses_recursive($model), true)) {
+            return true;
+        }
+
+        $teamId = $model->getAttribute('team_id');
+
+        return $teamId !== null && $user->teams->contains('id', $teamId);
     }
 
     private function allows(User $user, string $ability, Model|string $model): bool
