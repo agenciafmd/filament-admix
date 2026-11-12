@@ -9,16 +9,19 @@ use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
 use Agenciafmd\Admix\Resources\Users\UserResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Override;
 
 final class EditUser extends EditRecord
 {
     use RedirectBack;
 
+    #[Override]
     protected static string $resource = UserResource::class;
 
     /**
      * @var array<int, string>
      */
+    #[Override]
     protected $listeners = [
         'auditRestored',
     ];

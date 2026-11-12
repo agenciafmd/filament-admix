@@ -7,6 +7,7 @@ namespace Agenciafmd\Admix\Resources\Users\Pages;
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
 use Agenciafmd\Admix\Resources\Users\UserResource;
 use Filament\Resources\Pages\CreateRecord;
+use Override;
 
 /**
  * TODO: enviar verificação de e-mail no afterCreate()
@@ -16,5 +17,6 @@ final class CreateUser extends CreateRecord
 {
     use RedirectBack;
 
+    #[Override]
     protected static string $resource = UserResource::class;
 }

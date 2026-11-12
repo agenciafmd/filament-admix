@@ -22,12 +22,16 @@ use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
 
 final class RoleResource extends Resource
 {
+    #[Override]
     protected static ?string $model = Role::class;
 
+    #[Override]
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldCheck;
 
+    #[Override]
     protected static ?int $navigationSort = 2;
 
+    #[Override]
     protected static ?string $recordTitleAttribute = 'name';
 
     #[Override]

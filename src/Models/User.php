@@ -46,6 +46,7 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
     use SoftDeletes;
     use WithScopes;
 
+    #[Override]
     protected $attributes = [
         'type' => 'admix',
     ];

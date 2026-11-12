@@ -8,11 +8,13 @@ use Agenciafmd\Admix\Exports\Concerns\DefaultNotificationAndFileName;
 use Agenciafmd\Admix\Models\User;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
+use Override;
 
 final class UserExporter extends Exporter
 {
     use DefaultNotificationAndFileName;
 
+    #[Override]
     protected static ?string $model = User::class;
 
     public static function getColumns(): array

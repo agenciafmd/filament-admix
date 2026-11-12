@@ -14,6 +14,7 @@ use Override;
  */
 final class PermissionMatrix extends Field
 {
+    #[Override]
     protected string $view = 'filament-admix::filament.forms.components.permission-matrix';
 
     #[Override]

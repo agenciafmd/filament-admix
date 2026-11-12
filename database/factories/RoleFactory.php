@@ -6,12 +6,14 @@ namespace Agenciafmd\Admix\Database\Factories;
 
 use Agenciafmd\Admix\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Override;
 
 /**
  * @extends Factory<Role>
  */
 final class RoleFactory extends Factory
 {
+    #[Override]
     protected $model = Role::class;
 
     public function definition(): array

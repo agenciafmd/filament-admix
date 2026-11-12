@@ -63,7 +63,7 @@ final readonly class FilamentMacroMethodsExtension implements MethodsClassReflec
             $macro = $candidates[$class] ?? null;
 
             if (is_callable($macro)) {
-                return Closure::fromCallable($macro);
+                return $macro(...);
             }
         }
 

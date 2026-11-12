@@ -17,16 +17,21 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Override;
 use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
 
 final class UserResource extends Resource
 {
+    #[Override]
     protected static ?string $model = User::class;
 
+    #[Override]
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
+    #[Override]
     protected static ?int $navigationSort = 1;
 
+    #[Override]
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function getModelLabel(): string
