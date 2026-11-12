@@ -136,7 +136,10 @@ final class FilamentPanelProvider extends PanelProvider
             ])
             ->when(Team::isTenancyEnabled(), static fn (Panel $panel): Panel => $panel
                 ->tenant(Team::class, slugAttribute: 'slug')
-                ->tenantRegistration(RegisterTeam::class))
+                ->tenantRegistration(RegisterTeam::class)
+                ->tenantMenuItems([
+                    'register' => RegisterTeam::modalAction(...),
+                ]))
             ->viteTheme('resources/filament/filament-admix/css/theme.css', 'filament-admix');
     }
 

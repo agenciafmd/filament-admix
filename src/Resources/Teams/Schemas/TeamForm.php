@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Teams\Schemas;
 
+use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -66,7 +67,6 @@ final class TeamForm
                 ->required(),
             TextInput::make('slug')
                 ->translateLabel()
-                ->helperText(__('Used in the panel address.'))
                 ->alphaDash()
                 ->maxLength(255)
                 ->unique(ignoreRecord: true)
@@ -74,8 +74,9 @@ final class TeamForm
             Select::make('users')
                 ->label(__('Users'))
                 ->relationship('users', 'name')
+                ->getOptionLabelFromRecordUsing(static fn (User $record): string => "{$record->name} ({$record->email})")
                 ->multiple()
-                ->searchable()
+                ->searchable(['name', 'email'])
                 ->preload()
                 ->columnSpanFull(),
         ];

@@ -9,6 +9,7 @@ use Agenciafmd\Admix\Models\Team;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
 use Agenciafmd\Admix\Resources\Roles\RoleResource;
+use Agenciafmd\Admix\Resources\Teams\Pages\CreateTeam;
 use Agenciafmd\Admix\Resources\Teams\TeamResource;
 use Agenciafmd\Admix\Resources\Users\Pages\CreateUser;
 use Agenciafmd\Admix\Resources\Users\Pages\EditUser;
@@ -19,6 +20,8 @@ use Agenciafmd\Admix\Traits\BelongsToTeam;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Select;
+use Filament\Livewire\Sidebar;
 use Filament\Pages\Dashboard;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -214,6 +217,44 @@ it('lets administrators manage teams', function (): void {
 
     get(TeamResource::getUrl('index', tenant: $team))->assertOk();
     get(RoleResource::getUrl('index', tenant: $team))->assertOk();
+});
+
+it('shows the name and the e-mail of the users in the team form', function (): void {
+    $team = Team::factory()->create();
+    $member = User::factory()->create(['name' => 'Maria Souza', 'email' => 'maria@gmail.com']);
+
+    actingAsTeamMember(null, null);
+    Filament::setTenant($team);
+
+    Livewire::test(CreateTeam::class)
+        ->assertFormFieldExists('general.users', static fn (Select $field): bool => $field->getOptionLabelFromRecord($member) === 'Maria Souza (maria@gmail.com)');
+});
+
+it('creates teams in a modal from the tenant menu', function (): void {
+    $team = Team::factory()->create();
+    $member = User::factory()->create();
+
+    actingAsTeamMember(null, null);
+    Filament::setTenant($team);
+
+    Livewire::test(Sidebar::class)
+        ->mountAction('register')
+        ->set('mountedActions.0.data', [
+            'name' => 'Nova Equipe',
+            'slug' => 'nova-equipe',
+            'users' => [$member->getKey()],
+        ])
+        ->callMountedAction()
+        ->assertRedirect(Filament::getUrl(Team::query()->firstWhere('slug', 'nova-equipe')));
+
+    expect(Team::query()->firstWhere('slug', 'nova-equipe')->users->modelKeys())->toBe([$member->getKey()]);
+});
+
+it('hides the new team action from users that are not administrators', function (): void {
+    actingAsTeamMember(Team::factory()->create());
+
+    Livewire::test(Sidebar::class)
+        ->assertActionDoesNotExist('register');
 });
 
 it('scopes the models that belong to a team and fills the current team', function (): void {
