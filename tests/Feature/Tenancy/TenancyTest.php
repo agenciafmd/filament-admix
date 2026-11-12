@@ -30,6 +30,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -248,6 +249,18 @@ it('creates teams in a modal from the tenant menu', function (): void {
         ->assertRedirect(Filament::getUrl(Team::query()->firstWhere('slug', 'nova-equipe')));
 
     expect(Team::query()->firstWhere('slug', 'nova-equipe')->users->modelKeys())->toBe([$member->getKey()]);
+});
+
+it('shows the avatar of the team in the tenant menu instead of the initials', function (): void {
+    Storage::fake('public');
+
+    $team = Team::factory()->create(['avatar' => 'team/avatar/logo.jpg']);
+    $withoutAvatar = Team::factory()->create();
+
+    actingAsTeamMember(null, null);
+
+    expect(Filament::getTenantAvatarUrl($team))->toBe(Storage::url('team/avatar/logo.jpg'))
+        ->and($withoutAvatar->getFilamentAvatarUrl())->toBeNull();
 });
 
 it('hides the new team action from users that are not administrators', function (): void {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Agenciafmd\Admix\Resources\Teams\Schemas;
 
 use Agenciafmd\Admix\Models\User;
+use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize;
 use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -39,6 +40,15 @@ final class TeamForm
                                         ->translateLabel()
                                         ->default(true)
                                         ->columnSpanFull(),
+                                    ImageUploadWithAutomaticallyResize::make(
+                                        name: 'avatar',
+                                        directory: 'team/avatar',
+                                        width: 500,
+                                        height: 500,
+                                    )
+                                        ->avatar()
+                                        ->alignCenter()
+                                        ->columnSpanFull(),
                                     DateTimeEntry::make('created_at'),
                                     DateTimeEntry::make('updated_at'),
                                 ])
@@ -51,7 +61,7 @@ final class TeamForm
     }
 
     /**
-     * Fields shared with the team registration page.
+     * Fields shared by the edit form, the registration page and the "New team" modal of the tenant menu.
      *
      * @return array<int, TextInput|Select>
      */
