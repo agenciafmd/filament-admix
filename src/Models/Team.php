@@ -48,6 +48,21 @@ final class Team extends Model implements AuditableContract, HasAvatar
     }
 
     /**
+     * Slugs that teams cannot use, because the slug also names the subdomain of the team.
+     *
+     * @return array<int, string>
+     */
+    public static function reservedSlugs(): array
+    {
+        $slugs = config('filament-admix.tenancy.reserved_slugs', []);
+
+        return collect(is_array($slugs) ? $slugs : [])
+            ->filter(static fn (mixed $slug): bool => is_string($slug))
+            ->values()
+            ->all();
+    }
+
+    /**
      * Image shown in the tenant menu in place of the initials of the team.
      */
     public function getFilamentAvatarUrl(): ?string

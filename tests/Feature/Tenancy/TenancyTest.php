@@ -263,6 +263,20 @@ it('shows the avatar of the team in the tenant menu instead of the initials', fu
         ->and($withoutAvatar->getFilamentAvatarUrl())->toBeNull();
 });
 
+it('only accepts team slugs that work as subdomains', function (string $slug, string $rule): void {
+    actingAsTeamMember(null, null);
+    Filament::setTenant(Team::factory()->create());
+
+    Livewire::test(CreateTeam::class)
+        ->fillForm(['name' => 'Equipe', 'slug' => $slug])
+        ->call('create')
+        ->assertHasFormErrors(['slug' => $rule]);
+})->with([
+    'reserved' => ['admix', 'not_in'],
+    'uppercase' => ['Equipe', 'regex'],
+    'underscore' => ['minha_equipe', 'regex'],
+]);
+
 it('hides the new team action from users that are not administrators', function (): void {
     actingAsTeamMember(Team::factory()->create());
 

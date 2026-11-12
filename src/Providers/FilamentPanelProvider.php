@@ -77,6 +77,7 @@ final class FilamentPanelProvider extends PanelProvider
             ->default()
             ->id('admix')
             ->path('admix')
+            ->domain(is_string($domain = config('filament-admix.domain')) ? $domain : null)
             ->login(Login::class)
             ->passwordReset()
 //            ->emailVerification() // TODO

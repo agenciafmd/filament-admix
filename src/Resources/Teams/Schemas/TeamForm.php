@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Teams\Schemas;
 
+use Agenciafmd\Admix\Models\Team;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize;
 use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
@@ -77,8 +78,10 @@ final class TeamForm
                 ->required(),
             TextInput::make('slug')
                 ->translateLabel()
-                ->alphaDash()
-                ->maxLength(255)
+                ->helperText(__('Also names the subdomain of the team.'))
+                ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')
+                ->notIn(Team::reservedSlugs())
+                ->maxLength(63)
                 ->unique(ignoreRecord: true)
                 ->required(),
             Select::make('users')

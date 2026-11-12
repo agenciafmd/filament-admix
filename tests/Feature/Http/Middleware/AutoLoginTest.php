@@ -8,6 +8,7 @@ use Agenciafmd\Admix\Models\Role;
 use Agenciafmd\Admix\Models\User;
 use Filament\Pages\Dashboard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Tests\TestCase;
 
 use function Pest\Laravel\get;
@@ -16,6 +17,14 @@ pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 beforeEach(function (): void {
     app()->detectEnvironment(fn (): string => 'local');
+});
+
+/*
+ * Outside the local environment the TrustHosts middleware sets the trusted hosts on the static
+ * Request, which would leak to the next tests.
+ */
+afterEach(function (): void {
+    Request::setTrustedHosts([]);
 });
 
 it('logs in as the configured user on the local environment', function (): void {

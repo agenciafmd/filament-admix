@@ -129,6 +129,10 @@ Com ela desligada, nada muda. Ligada:
   - o trait cria a relação `team()`, filtra as consultas pela equipe atual (`Filament::getTenant()`) e preenche o
     `team_id` ao criar;
   - fora do painel (jobs, exports, rotas públicas), defina a equipe com `Filament::setTenant($team)` antes das consultas;
+- **slug da equipe:** também é o subdomínio dela, então só aceita minúsculas, números e hífen, e não pode usar os
+  nomes de `filament-admix.tenancy.reserved_slugs` (`Team::reservedSlugs()`);
+- **host do painel:** `filament-admix.domain` (env `ADMIX_DOMAIN`) restringe o painel a um host; vazio, ele responde
+  em qualquer host;
 - **Resource sem equipe** (dado global): declare `protected static bool $isScopedToTenant = false;`;
 - **regras `unique`/`exists`:** ignoram os escopos do Eloquent. Num model com equipe, use `scopedUnique()` /
   `scopedExists()` do Filament;

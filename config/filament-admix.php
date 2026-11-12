@@ -25,7 +25,26 @@ return [
      */
     'tenancy' => [
         'enabled' => env('ADMIX_TENANCY', false),
+        /*
+         * Team slugs that cannot be used, because the slug also names the subdomain of the team.
+         */
+        'reserved_slugs' => [
+            'admin',
+            'admix',
+            'api',
+            'app',
+            'ftp',
+            'mail',
+            'pop',
+            'pop3',
+            'smtp',
+            'www',
+        ],
     ],
+    /*
+     * Host of the panel (ex.: app.landingflow.com.br). Empty, the panel answers on every host.
+     */
+    'domain' => env('ADMIX_DOMAIN'),
     'plugins' => [
         //        ArticlesPlugin::class,
     ],
