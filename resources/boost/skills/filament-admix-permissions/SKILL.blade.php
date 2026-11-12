@@ -59,7 +59,8 @@ RelationManager que lista os filhos no Resource pai só aparece com a permissão
 - colunas editáveis (`ToggleColumn`, `SelectColumn`, `TextInputColumn`, `CheckboxColumn`) ignoram policies no
   Filament; o admix as desabilita globalmente com `Gate::denies('update', $record)`. Se a tabela chamar `->disabled()`
   na coluna, isso sobrescreve o padrão — inclua a checagem de `update` na sua condição
-- somente administradores alteram/excluem administradores e deixam alguém sem grupo; ninguém troca o próprio grupo
+- somente administradores alteram/excluem administradores e veem o campo de grupo no formulário de Usuários; quem não
+  é administrador cria usuários com o próprio grupo e não altera o grupo de ninguém; ninguém troca o próprio grupo
 
 ## Permissões extras: `getExtraPermissions()`
 

@@ -58,8 +58,8 @@ final class UserForm
                                         ->label(__('Role'))
                                         ->relationship('role', 'name')
                                         ->placeholder(__('Administrator'))
-                                        ->selectablePlaceholder(fn (): bool => self::authenticatedUser()->isAdmin())
-                                        ->required(fn (): bool => ! self::authenticatedUser()->isAdmin())
+                                        // Only administrators choose the role; other users create users with their own role (CreateUser).
+                                        ->visible(fn (): bool => self::authenticatedUser()->isAdmin())
                                         ->disabled(fn (?User $record): bool => self::authenticatedUser()->is($record))
                                         ->native(false)
                                         ->preload(),

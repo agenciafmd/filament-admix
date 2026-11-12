@@ -25,6 +25,24 @@ final class CreateUser extends CreateRecord
     protected static string $resource = UserResource::class;
 
     /**
+     * Users that are not administrators do not choose the role: the new user gets the role of who created it.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    #[Override]
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $creator = auth()->user();
+
+        if ($creator instanceof User && ! $creator->isAdmin()) {
+            $data['role_id'] = $creator->role_id;
+        }
+
+        return $data;
+    }
+
+    /**
      * With the tenancy enabled, the user joins the current team. An e-mail that already
      * exists adds that user to the team, without changing their data.
      *

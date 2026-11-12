@@ -133,7 +133,6 @@ it('adds an existing e-mail to the team instead of creating another user', funct
             'name' => 'Another name',
             'email' => $existing->email,
             'password' => 'Secret@123456',
-            'role_id' => $role->getKey(),
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -145,7 +144,6 @@ it('adds an existing e-mail to the team instead of creating another user', funct
 
 it('adds new users to the current team', function (): void {
     $team = Team::factory()->create();
-    $role = Role::factory()->create();
 
     actingAsTeamMember($team, [userPermission('view'), userPermission('create')]);
 
@@ -154,7 +152,6 @@ it('adds new users to the current team', function (): void {
             'name' => 'New user',
             'email' => 'new-user@gmail.com',
             'password' => 'Secret@123456',
-            'role_id' => $role->getKey(),
         ])
         ->call('create')
         ->assertHasNoFormErrors();
