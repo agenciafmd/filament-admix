@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Pages;
 
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
 use Agenciafmd\Admix\Resources\Users\UserResource;
@@ -43,17 +43,17 @@ final class CreateUser extends CreateRecord
     }
 
     /**
-     * With the tenancy enabled, the user joins the current team. An e-mail that already
-     * exists adds that user to the team, without changing their data.
+     * With the tenancy enabled, the user joins the current organization. An e-mail that already
+     * exists adds that user to the organization, without changing their data.
      *
      * @param  array<string, mixed>  $data
      */
     #[Override]
     protected function handleRecordCreation(array $data): Model
     {
-        $team = Filament::getTenant();
+        $organization = Filament::getTenant();
 
-        if (! Team::isTenancyEnabled() || ! $team instanceof Team) {
+        if (! Organization::isTenancyEnabled() || ! $organization instanceof Organization) {
             return parent::handleRecordCreation($data);
         }
 
@@ -69,7 +69,7 @@ final class CreateUser extends CreateRecord
         $user ??= parent::handleRecordCreation($data);
 
         if ($user instanceof User) {
-            $user->teams()->syncWithoutDetaching([$team->getKey()]);
+            $user->organizations()->syncWithoutDetaching([$organization->getKey()]);
         }
 
         return $user;

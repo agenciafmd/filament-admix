@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Agenciafmd\Admix\Resources\Teams\Pages;
+namespace Agenciafmd\Admix\Resources\Organizations\Pages;
 
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
-use Agenciafmd\Admix\Resources\Teams\TeamResource;
+use Agenciafmd\Admix\Resources\Organizations\OrganizationResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
 use Override;
 
-final class EditTeam extends EditRecord
+final class EditOrganization extends EditRecord
 {
     use RedirectBack;
 
     #[Override]
-    protected static string $resource = TeamResource::class;
+    protected static string $resource = OrganizationResource::class;
 
     /**
      * @var array<int, string>
@@ -32,7 +32,7 @@ final class EditTeam extends EditRecord
     {
         $record = $this->getRecord();
 
-        if ($record instanceof Team && $record->trashed()) {
+        if ($record instanceof Organization && $record->trashed()) {
             return [];
         }
 

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('teams', static function (Blueprint $table): void {
+        Schema::create('organizations', static function (Blueprint $table): void {
             $table->id();
             $table->boolean('is_active')
                 ->default(true)

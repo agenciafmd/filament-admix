@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Tables;
 
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Users\UserResource;
 // use Agenciafmd\Admix\Resources\Users\Exports\UserExporter;
@@ -41,10 +41,10 @@ final class UsersTable
                     ->label(__('Role'))
                     ->placeholder(__('Administrator'))
                     ->sortable(),
-                TextColumn::make('teams.name')
-                    ->label(__('Teams'))
+                TextColumn::make('organizations.name')
+                    ->label(__('Organizations'))
                     ->badge()
-                    ->visible(fn (): bool => Team::isTenancyEnabled() && auth()->user() instanceof User && auth()->user()->isAdmin()),
+                    ->visible(fn (): bool => Organization::isTenancyEnabled() && auth()->user() instanceof User && auth()->user()->isAdmin()),
                 ToggleColumn::make('is_active')
                     ->translateLabel()
                     ->disabled(fn (User $record): bool => $record->is(auth()->user()) || Gate::denies('update', $record)),

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('teams', static function (Blueprint $table): void {
+        Schema::table('organizations', static function (Blueprint $table): void {
             $table->text('avatar')
                 ->after('slug')
                 ->nullable();

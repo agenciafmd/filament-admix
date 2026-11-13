@@ -105,42 +105,42 @@ Regras:
 ## Resource só para administradores: `isAdministratorsOnly()`
 
 O Resource que declara `public static function isAdministratorsOnly(): bool` retornando `true` fica restrito aos
-administradores e sai da matriz de permissões dos Grupos. O admix usa isso em `TeamResource` (sempre) e em
+administradores e sai da matriz de permissões dos Grupos. O admix usa isso em `OrganizationResource` (sempre) e em
 `RoleResource` (com a tenancy ligada).
 
-## Equipes (tenancy)
+## Organizações (tenancy)
 
 A tenancy usa a tenancy nativa do Filament e vem desligada (`filament-admix.tenancy.enabled`, env `ADMIX_TENANCY`).
 Com ela desligada, nada muda. Ligada:
 
-- **URLs:** ficam `/admix/{team:slug}/...`; o model é `Agenciafmd\Admix\Models\Team` e o vínculo é muitos-para-muitos
-  (`team_user`, `$user->teams()`);
-- **administrador** (sem grupo) acessa todas as equipes e gerencia Equipes e Grupos;
-- **demais usuários:** acessam só as suas equipes ativas, sempre com um grupo, que vale em todas as equipes dele.
-  Sem equipe ativa, não entram no painel;
+- **URLs:** ficam `/admix/{organization:slug}/...`; o model é `Agenciafmd\Admix\Models\Organization` e o vínculo é muitos-para-muitos
+  (`organization_user`, `$user->organizations()`);
+- **administrador** (sem grupo) acessa todas as organizações e gerencia Organizações e Grupos;
+- **demais usuários:** acessam só as suas organizações ativas, sempre com um grupo, que vale em todas as organizações dele.
+  Sem organização ativa, não entram no painel;
 - **Usuários:**
-  - a lista mostra os usuários da equipe atual;
-  - criar com um e-mail existente vincula esse usuário à equipe;
-  - quem não é administrador não altera um usuário que está em outras equipes;
-  - deletar remove o usuário da equipe e só o exclui quando ele não tem mais nenhuma equipe;
-- **models de pacote** que pertencem a uma equipe:
-  - recebem a coluna `team_id` (`foreignId('team_id')->constrained('teams')->cascadeOnDelete()`) e o trait
-    `Agenciafmd\Admix\Traits\BelongsToTeam`;
-  - o trait cria a relação `team()`, filtra as consultas pela equipe atual (`Filament::getTenant()`) e preenche o
-    `team_id` ao criar;
-  - fora do painel (jobs, exports, rotas públicas), defina a equipe com `Filament::setTenant($team)` antes das consultas;
-- **slug da equipe:** também é o subdomínio dela, então só aceita minúsculas, números e hífen, e não pode usar os
-  nomes de `filament-admix.tenancy.reserved_slugs` (`Team::reservedSlugs()`);
+  - a lista mostra os usuários da organização atual;
+  - criar com um e-mail existente vincula esse usuário à organização;
+  - quem não é administrador não altera um usuário que está em outras organizações;
+  - deletar remove o usuário da organização e só o exclui quando ele não tem mais nenhuma organização;
+- **models de pacote** que pertencem a uma organização:
+  - recebem a coluna `organization_id` (`foreignId('organization_id')->constrained('organizations')->cascadeOnDelete()`) e o trait
+    `Agenciafmd\Admix\Traits\BelongsToOrganization`;
+  - o trait cria a relação `organization()`, filtra as consultas pela organização atual (`Filament::getTenant()`) e preenche o
+    `organization_id` ao criar;
+  - fora do painel (jobs, exports, rotas públicas), defina a organização com `Filament::setTenant($organization)` antes das consultas;
+- **slug da organização:** também é o subdomínio dela, então só aceita minúsculas, números e hífen, e não pode usar os
+  nomes de `filament-admix.tenancy.reserved_slugs` (`Organization::reservedSlugs()`);
 - **host do painel:** `filament-admix.domain` (env `ADMIX_DOMAIN`) restringe o painel a um host; vazio, ele responde
   em qualquer host;
-- **Resource sem equipe** (dado global): declare `protected static bool $isScopedToTenant = false;`;
-- **regras `unique`/`exists`:** ignoram os escopos do Eloquent. Num model com equipe, use `scopedUnique()` /
+- **Resource sem organização** (dado global): declare `protected static bool $isScopedToTenant = false;`;
+- **regras `unique`/`exists`:** ignoram os escopos do Eloquent. Num model com organização, use `scopedUnique()` /
   `scopedExists()` do Filament;
-- a `ResourcePolicy` também confere a equipe: quem não é administrador só acessa registros com `team_id` de uma
-  equipe sua, mesmo fora do escopo do painel (callbacks, jobs);
-- **exportações** rodam num job, sem a equipe atual: filtre a equipe explicitamente no `modifyQuery()` do Exporter;
-- **rotas públicas** não têm equipe atual: grave o `team_id` a partir do registro de origem (ex.: o lead herda a
-  equipe da página);
+- a `ResourcePolicy` também confere a organização: quem não é administrador só acessa registros com `organization_id` de uma
+  organização sua, mesmo fora do escopo do painel (callbacks, jobs);
+- **exportações** rodam num job, sem a organização atual: filtre a organização explicitamente no `modifyQuery()` do Exporter;
+- **rotas públicas** não têm organização atual: grave o `organization_id` a partir do registro de origem (ex.: o lead herda a
+  organização da página);
 - **testes com a tenancy ligada:** a config precisa valer antes do boot (as rotas mudam). Use o trait
   `Agenciafmd\Admix\Testing\WithTenancy` no teste (`pest()->use(WithTenancy::class)`).
 

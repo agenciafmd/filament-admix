@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users\Schemas;
 
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize;
 use Agenciafmd\Admix\Resources\Forms\Components\PasswordInput;
@@ -44,10 +44,10 @@ final class UserForm
                                         ->rules([
                                             'email:rfc,dns',
                                         ])
-                                        // With the tenancy enabled, an existing e-mail adds that user to the team (CreateUser).
+                                        // With the tenancy enabled, an existing e-mail adds that user to the organization (CreateUser).
                                         ->rule(
                                             static fn (?User $record): Unique => Rule::unique(User::class, 'email')->ignore($record),
-                                            static fn (string $operation): bool => ! Team::isTenancyEnabled() || $operation !== Operation::Create->value,
+                                            static fn (string $operation): bool => ! Organization::isTenancyEnabled() || $operation !== Operation::Create->value,
                                         )
                                         ->live(onBlur: true)
                                         ->afterStateUpdated(fn (Page $livewire) => $livewire->validateOnly('data.email'))

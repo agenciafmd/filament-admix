@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Agenciafmd\Admix\Resources\Teams\Tables;
+namespace Agenciafmd\Admix\Resources\Organizations\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -16,7 +16,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class TeamsTable
+final class OrganizationsTable
 {
     public static function configure(Table $table): Table
     {

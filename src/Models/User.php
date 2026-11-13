@@ -75,7 +75,7 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
     }
 
     /**
-     * With the tenancy enabled, users with a role also need an active team.
+     * With the tenancy enabled, users with a role also need an active organization.
      */
     public function canAccessPanel(Panel $panel): bool
     {
@@ -83,29 +83,29 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
             return false;
         }
 
-        if (! Team::isTenancyEnabled() || $this->isAdmin()) {
+        if (! Organization::isTenancyEnabled() || $this->isAdmin()) {
             return true;
         }
 
-        return $this->teams()
+        return $this->organizations()
             ->isActive()
             ->exists();
     }
 
     /**
-     * Administrators access every team; the other users, their active teams.
+     * Administrators access every organization; the other users, their active organizations.
      *
-     * @return Collection<int, Team>
+     * @return Collection<int, Organization>
      */
     public function getTenants(Panel $panel): Collection
     {
         if ($this->isAdmin()) {
-            return Team::query()
+            return Organization::query()
                 ->sort()
                 ->get();
         }
 
-        return $this->teams()
+        return $this->organizations()
             ->isActive()
             ->sort()
             ->get();
@@ -113,7 +113,7 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
 
     public function canAccessTenant(Model $tenant): bool
     {
-        if (! $tenant instanceof Team) {
+        if (! $tenant instanceof Organization) {
             return false;
         }
 
@@ -122,7 +122,7 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
         }
 
         return $tenant->is_active
-            && $this->teams()
+            && $this->organizations()
                 ->whereKey($tenant->getKey())
                 ->exists();
     }
@@ -134,25 +134,25 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
     }
 
     /**
-     * Whether the user also belongs to teams other than the current one (tenancy enabled only).
+     * Whether the user also belongs to organizations other than the current one (tenancy enabled only).
      */
-    public function belongsToOtherTeams(): bool
+    public function belongsToOtherOrganizations(): bool
     {
-        $team = Filament::getTenant();
+        $organization = Filament::getTenant();
 
-        if (! Team::isTenancyEnabled() || ! $team instanceof Team) {
+        if (! Organization::isTenancyEnabled() || ! $organization instanceof Organization) {
             return false;
         }
 
-        return $this->teams->contains(static fn (Team $userTeam): bool => ! $userTeam->is($team));
+        return $this->organizations->contains(static fn (Organization $userOrganization): bool => ! $userOrganization->is($organization));
     }
 
     /**
-     * @return BelongsToMany<Team, $this>
+     * @return BelongsToMany<Organization, $this>
      */
-    public function teams(): BelongsToMany
+    public function organizations(): BelongsToMany
     {
-        return $this->belongsToMany(Team::class)
+        return $this->belongsToMany(Organization::class)
             ->withTimestamps();
     }
 

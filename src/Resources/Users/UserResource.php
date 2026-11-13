@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Users;
 
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Users\Pages\CreateUser;
 use Agenciafmd\Admix\Resources\Users\Pages\EditUser;
@@ -37,7 +37,7 @@ final class UserResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
-     * Users may belong to several teams, so the team scope is applied in `getEloquentQuery()`.
+     * Users may belong to several organizations, so the organization scope is applied in `getEloquentQuery()`.
      */
     #[Override]
     protected static bool $isScopedToTenant = false;
@@ -79,37 +79,37 @@ final class UserResource extends Resource
     }
 
     /**
-     * With the tenancy enabled, users with a role only see the users of the current team.
+     * With the tenancy enabled, users with a role only see the users of the current organization.
      */
     #[Override]
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
-            ->with('teams');
-        $team = Filament::getTenant();
+            ->with('organizations');
+        $organization = Filament::getTenant();
 
-        if (! Team::isTenancyEnabled() || ! $team instanceof Team || self::authenticatedUser()?->isAdmin()) {
+        if (! Organization::isTenancyEnabled() || ! $organization instanceof Organization || self::authenticatedUser()?->isAdmin()) {
             return $query;
         }
 
-        return $query->whereRelation('teams', $team->getQualifiedKeyName(), $team->getKey());
+        return $query->whereRelation('organizations', $organization->getQualifiedKeyName(), $organization->getKey());
     }
 
     /**
      * Deletes the user. With the tenancy enabled, users with a role only remove the user
-     * from the current team, and the user is deleted when no team is left.
+     * from the current organization, and the user is deleted when no organization is left.
      */
     public static function deleteRecord(User $user): bool
     {
-        $team = Filament::getTenant();
+        $organization = Filament::getTenant();
 
-        if (! Team::isTenancyEnabled() || ! $team instanceof Team || self::authenticatedUser()?->isAdmin()) {
+        if (! Organization::isTenancyEnabled() || ! $organization instanceof Organization || self::authenticatedUser()?->isAdmin()) {
             return (bool) $user->delete();
         }
 
-        $user->teams()->detach($team);
+        $user->organizations()->detach($organization);
 
-        if ($user->teams()->exists()) {
+        if ($user->organizations()->exists()) {
             return true;
         }
 

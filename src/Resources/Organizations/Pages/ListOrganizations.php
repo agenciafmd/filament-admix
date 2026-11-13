@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Agenciafmd\Admix\Resources\Teams\Pages;
+namespace Agenciafmd\Admix\Resources\Organizations\Pages;
 
-use Agenciafmd\Admix\Resources\Teams\TeamResource;
+use Agenciafmd\Admix\Resources\Organizations\OrganizationResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Override;
 
-final class ListTeams extends ListRecords
+final class ListOrganizations extends ListRecords
 {
     #[Override]
-    protected static string $resource = TeamResource::class;
+    protected static string $resource = OrganizationResource::class;
 
     protected function getHeaderActions(): array
     {

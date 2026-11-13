@@ -20,13 +20,13 @@ return [
      */
     'auto_login' => env('ADMIX_AUTO_LOGIN', true),
     /*
-     * Teams (multi-tenant): each user only sees the teams they belong to.
-     * Administrators (users without a role) access every team.
+     * Organizations (multi-tenant): each user only sees the organizations they belong to.
+     * Administrators (users without a role) access every organization.
      */
     'tenancy' => [
         'enabled' => env('ADMIX_TENANCY', false),
         /*
-         * Team slugs that cannot be used, because the slug also names the subdomain of the team.
+         * Organization slugs that cannot be used, because the slug also names the subdomain of the organization.
          */
         'reserved_slugs' => [
             'admin',

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Agenciafmd\Admix\Resources\Teams;
+namespace Agenciafmd\Admix\Resources\Organizations;
 
-use Agenciafmd\Admix\Models\Team;
-use Agenciafmd\Admix\Resources\Teams\Pages\CreateTeam;
-use Agenciafmd\Admix\Resources\Teams\Pages\EditTeam;
-use Agenciafmd\Admix\Resources\Teams\Pages\ListTeams;
-use Agenciafmd\Admix\Resources\Teams\Schemas\TeamForm;
-use Agenciafmd\Admix\Resources\Teams\Tables\TeamsTable;
+use Agenciafmd\Admix\Models\Organization;
+use Agenciafmd\Admix\Resources\Organizations\Pages\CreateOrganization;
+use Agenciafmd\Admix\Resources\Organizations\Pages\EditOrganization;
+use Agenciafmd\Admix\Resources\Organizations\Pages\ListOrganizations;
+use Agenciafmd\Admix\Resources\Organizations\Schemas\OrganizationForm;
+use Agenciafmd\Admix\Resources\Organizations\Tables\OrganizationsTable;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,12 +21,12 @@ use Override;
 use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
 
 /**
- * Teams (tenants): only exists with the tenancy enabled and only administrators manage them.
+ * Organizations (tenants): only exists with the tenancy enabled and only administrators manage them.
  */
-final class TeamResource extends Resource
+final class OrganizationResource extends Resource
 {
     #[Override]
-    protected static ?string $model = Team::class;
+    protected static ?string $model = Organization::class;
 
     #[Override]
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
@@ -48,31 +48,31 @@ final class TeamResource extends Resource
     #[Override]
     public static function canAccess(): bool
     {
-        return Team::isTenancyEnabled() && parent::canAccess();
+        return Organization::isTenancyEnabled() && parent::canAccess();
     }
 
     #[Override]
     public static function getModelLabel(): string
     {
-        return __('Team');
+        return __('Organization');
     }
 
     #[Override]
     public static function getPluralModelLabel(): string
     {
-        return __('Teams');
+        return __('Organizations');
     }
 
     #[Override]
     public static function form(Schema $schema): Schema
     {
-        return TeamForm::configure($schema);
+        return OrganizationForm::configure($schema);
     }
 
     #[Override]
     public static function table(Table $table): Table
     {
-        return TeamsTable::configure($table);
+        return OrganizationsTable::configure($table);
     }
 
     #[Override]
@@ -87,9 +87,9 @@ final class TeamResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListTeams::route('/'),
-            'create' => CreateTeam::route('/create'),
-            'edit' => EditTeam::route('/{record}/edit'),
+            'index' => ListOrganizations::route('/'),
+            'create' => CreateOrganization::route('/create'),
+            'edit' => EditOrganization::route('/{record}/edit'),
         ];
     }
 

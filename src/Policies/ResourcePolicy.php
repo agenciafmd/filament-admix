@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Policies;
 
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
-use Agenciafmd\Admix\Traits\BelongsToTeam;
+use Agenciafmd\Admix\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -35,7 +35,7 @@ final readonly class ResourcePolicy
             return false;
         }
 
-        if ($model instanceof Model && ! $this->belongsToUserTeams($user, $model)) {
+        if ($model instanceof Model && ! $this->belongsToUserOrganizations($user, $model)) {
             return false;
         }
 
@@ -44,8 +44,8 @@ final readonly class ResourcePolicy
             return false;
         }
 
-        // Users shared with other teams can only be seen or removed from the current team.
-        if ($model instanceof User && $model->belongsToOtherTeams() && ! in_array($ability, ['viewAny', 'view', 'delete'], true)) {
+        // Users shared with other organizations can only be seen or removed from the current organization.
+        if ($model instanceof User && $model->belongsToOtherOrganizations() && ! in_array($ability, ['viewAny', 'view', 'delete'], true)) {
             return false;
         }
 
@@ -128,18 +128,18 @@ final readonly class ResourcePolicy
     }
 
     /**
-     * With the tenancy enabled, records of models with `BelongsToTeam` are only reachable
-     * by members of their team, even outside the panel scope (callbacks, jobs).
+     * With the tenancy enabled, records of models with `BelongsToOrganization` are only reachable
+     * by members of their organization, even outside the panel scope (callbacks, jobs).
      */
-    private function belongsToUserTeams(User $user, Model $model): bool
+    private function belongsToUserOrganizations(User $user, Model $model): bool
     {
-        if (! Team::isTenancyEnabled() || ! in_array(BelongsToTeam::class, class_uses_recursive($model), true)) {
+        if (! Organization::isTenancyEnabled() || ! in_array(BelongsToOrganization::class, class_uses_recursive($model), true)) {
             return true;
         }
 
-        $teamId = $model->getAttribute('team_id');
+        $organizationId = $model->getAttribute('organization_id');
 
-        return $teamId !== null && $user->teams->contains('id', $teamId);
+        return $organizationId !== null && $user->organizations->contains('id', $organizationId);
     }
 
     private function allows(User $user, string $ability, Model|string $model): bool

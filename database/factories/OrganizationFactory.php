@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Database\Factories;
 
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Override;
 
 /**
- * @extends Factory<Team>
+ * @extends Factory<Organization>
  */
-final class TeamFactory extends Factory
+final class OrganizationFactory extends Factory
 {
     #[Override]
-    protected $model = Team::class;
+    protected $model = Organization::class;
 
     public function definition(): array
     {

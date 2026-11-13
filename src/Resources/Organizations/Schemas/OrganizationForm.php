@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Agenciafmd\Admix\Resources\Teams\Schemas;
+namespace Agenciafmd\Admix\Resources\Organizations\Schemas;
 
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Forms\Components\ImageUploadWithAutomaticallyResize;
 use Agenciafmd\Admix\Resources\Infolists\Components\DateTimeEntry;
@@ -16,7 +16,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
-final class TeamForm
+final class OrganizationForm
 {
     public static function configure(Schema $schema): Schema
     {
@@ -43,7 +43,7 @@ final class TeamForm
                                         ->columnSpanFull(),
                                     ImageUploadWithAutomaticallyResize::make(
                                         name: 'avatar',
-                                        directory: 'team/avatar',
+                                        directory: 'organization/avatar',
                                         width: 500,
                                         height: 500,
                                     )
@@ -62,7 +62,7 @@ final class TeamForm
     }
 
     /**
-     * Fields shared by the edit form, the registration page and the "New team" modal of the tenant menu.
+     * Fields shared by the edit form, the registration page and the "New organization" modal of the tenant menu.
      *
      * @return array<int, TextInput|Select>
      */
@@ -79,7 +79,7 @@ final class TeamForm
             TextInput::make('slug')
                 ->translateLabel()
                 ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')
-                ->notIn(Team::reservedSlugs())
+                ->notIn(Organization::reservedSlugs())
                 ->maxLength(63)
                 ->unique(ignoreRecord: true)
                 ->required(),

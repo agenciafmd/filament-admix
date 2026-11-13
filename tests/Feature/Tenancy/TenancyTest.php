@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Tests\Feature\Tenancy;
 
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\Role;
-use Agenciafmd\Admix\Models\Team;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
+use Agenciafmd\Admix\Resources\Organizations\OrganizationResource;
+use Agenciafmd\Admix\Resources\Organizations\Pages\CreateOrganization;
 use Agenciafmd\Admix\Resources\Roles\RoleResource;
-use Agenciafmd\Admix\Resources\Teams\Pages\CreateTeam;
-use Agenciafmd\Admix\Resources\Teams\TeamResource;
 use Agenciafmd\Admix\Resources\Users\Pages\CreateUser;
 use Agenciafmd\Admix\Resources\Users\Pages\EditUser;
 use Agenciafmd\Admix\Resources\Users\Pages\ListUsers;
 use Agenciafmd\Admix\Resources\Users\UserResource;
 use Agenciafmd\Admix\Testing\WithTenancy;
-use Agenciafmd\Admix\Traits\BelongsToTeam;
+use Agenciafmd\Admix\Traits\BelongsToOrganization;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Facades\Filament;
@@ -38,9 +38,9 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
 #[Unguarded]
-final class TeamNote extends Model
+final class OrganizationNote extends Model
 {
-    use BelongsToTeam;
+    use BelongsToOrganization;
     use HasFactory;
 }
 
@@ -49,21 +49,21 @@ pest()->extend(TestCase::class)->use(RefreshDatabase::class, WithTenancy::class)
 /**
  * @param  array<int, string>|null  $permissions  null creates an administrator
  */
-function actingAsTeamMember(?Team $team, ?array $permissions = []): User
+function actingAsOrganizationMember(?Organization $organization, ?array $permissions = []): User
 {
     $user = User::factory()->create([
         'role_id' => $permissions === null ? null : Role::factory()->withPermissions($permissions)->create()->getKey(),
     ]);
 
-    if ($team instanceof Team) {
-        $user->teams()->attach($team);
+    if ($organization instanceof Organization) {
+        $user->organizations()->attach($organization);
     }
 
     actingAs($user->fresh(), 'admix-web');
     Filament::setCurrentPanel('admix');
 
-    if ($team instanceof Team) {
-        Filament::setTenant($team);
+    if ($organization instanceof Organization) {
+        Filament::setTenant($organization);
     }
 
     return $user;
@@ -74,63 +74,63 @@ function userPermission(string $ability): string
     return PermissionRegistry::permissionKey(UserResource::class, $ability);
 }
 
-it('denies the panel to users with a role and without an active team', function (): void {
-    $team = Team::factory()->inactive()->create();
+it('denies the panel to users with a role and without an active organization', function (): void {
+    $organization = Organization::factory()->inactive()->create();
 
-    actingAsTeamMember($team);
+    actingAsOrganizationMember($organization);
 
-    get(Dashboard::getUrl(panel: 'admix', tenant: $team))->assertForbidden();
+    get(Dashboard::getUrl(panel: 'admix', tenant: $organization))->assertForbidden();
 });
 
-it('only lets users with a role access their own active teams', function (): void {
-    $team = Team::factory()->create();
-    $otherTeam = Team::factory()->create();
-    $user = actingAsTeamMember($team, [userPermission('view')]);
+it('only lets users with a role access their own active organizations', function (): void {
+    $organization = Organization::factory()->create();
+    $otherOrganization = Organization::factory()->create();
+    $user = actingAsOrganizationMember($organization, [userPermission('view')]);
 
-    expect($user->getTenants(Filament::getPanel('admix'))->modelKeys())->toBe([$team->getKey()]);
+    expect($user->getTenants(Filament::getPanel('admix'))->modelKeys())->toBe([$organization->getKey()]);
 
-    get(UserResource::getUrl('index', tenant: $team))->assertOk();
-    get(UserResource::getUrl('index', tenant: $otherTeam))->assertNotFound();
+    get(UserResource::getUrl('index', tenant: $organization))->assertOk();
+    get(UserResource::getUrl('index', tenant: $otherOrganization))->assertNotFound();
 });
 
-it('lets administrators access every team', function (): void {
-    $teams = Team::factory()->count(2)->create();
-    $administrator = actingAsTeamMember(null, null);
+it('lets administrators access every organization', function (): void {
+    $organizations = Organization::factory()->count(2)->create();
+    $administrator = actingAsOrganizationMember(null, null);
 
-    expect($administrator->getTenants(Filament::getPanel('admix'))->modelKeys())->toEqualCanonicalizing($teams->modelKeys());
+    expect($administrator->getTenants(Filament::getPanel('admix'))->modelKeys())->toEqualCanonicalizing($organizations->modelKeys());
 
-    get(UserResource::getUrl('index', tenant: $teams->last()))->assertOk();
+    get(UserResource::getUrl('index', tenant: $organizations->last()))->assertOk();
 });
 
-it('applies the role permissions inside the team', function (): void {
-    $team = Team::factory()->create();
+it('applies the role permissions inside the organization', function (): void {
+    $organization = Organization::factory()->create();
 
-    actingAsTeamMember($team);
+    actingAsOrganizationMember($organization);
 
-    get(UserResource::getUrl('index', tenant: $team))->assertForbidden();
+    get(UserResource::getUrl('index', tenant: $organization))->assertForbidden();
 });
 
-it('lists only the users of the current team for users with a role', function (): void {
-    $team = Team::factory()->create();
+it('lists only the users of the current organization for users with a role', function (): void {
+    $organization = Organization::factory()->create();
     $member = User::factory()->create(['role_id' => Role::factory()]);
-    $member->teams()->attach($team);
+    $member->organizations()->attach($organization);
     $outsider = User::factory()->create(['role_id' => Role::factory()]);
-    $outsider->teams()->attach(Team::factory()->create());
+    $outsider->organizations()->attach(Organization::factory()->create());
 
-    $user = actingAsTeamMember($team, [userPermission('view')]);
+    $user = actingAsOrganizationMember($organization, [userPermission('view')]);
 
     Livewire::test(ListUsers::class)
         ->assertCanSeeTableRecords([$user, $member])
         ->assertCanNotSeeTableRecords([$outsider]);
 });
 
-it('adds an existing e-mail to the team instead of creating another user', function (): void {
-    $team = Team::factory()->create();
+it('adds an existing e-mail to the organization instead of creating another user', function (): void {
+    $organization = Organization::factory()->create();
     $role = Role::factory()->create();
     $existing = User::factory()->create(['role_id' => $role, 'name' => 'Original name', 'email' => 'existing@gmail.com']);
-    $existing->teams()->attach(Team::factory()->create());
+    $existing->organizations()->attach(Organization::factory()->create());
 
-    actingAsTeamMember($team, [userPermission('view'), userPermission('create')]);
+    actingAsOrganizationMember($organization, [userPermission('view'), userPermission('create')]);
 
     Livewire::test(CreateUser::class)
         ->fillForm([
@@ -143,13 +143,13 @@ it('adds an existing e-mail to the team instead of creating another user', funct
 
     expect(User::query()->where('email', $existing->email)->count())->toBe(1)
         ->and($existing->fresh()->name)->toBe('Original name')
-        ->and($existing->teams()->whereKey($team->getKey())->exists())->toBeTrue();
+        ->and($existing->organizations()->whereKey($organization->getKey())->exists())->toBeTrue();
 });
 
-it('adds new users to the current team', function (): void {
-    $team = Team::factory()->create();
+it('adds new users to the current organization', function (): void {
+    $organization = Organization::factory()->create();
 
-    actingAsTeamMember($team, [userPermission('view'), userPermission('create')]);
+    actingAsOrganizationMember($organization, [userPermission('view'), userPermission('create')]);
 
     Livewire::test(CreateUser::class)
         ->fillForm([
@@ -160,18 +160,18 @@ it('adds new users to the current team', function (): void {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    expect(User::query()->firstWhere('email', 'new-user@gmail.com')->teams->modelKeys())->toBe([$team->getKey()]);
+    expect(User::query()->firstWhere('email', 'new-user@gmail.com')->organizations->modelKeys())->toBe([$organization->getKey()]);
 });
 
-it('only removes users shared with other teams from the current team', function (): void {
-    $team = Team::factory()->create();
-    $otherTeam = Team::factory()->create();
+it('only removes users shared with other organizations from the current organization', function (): void {
+    $organization = Organization::factory()->create();
+    $otherOrganization = Organization::factory()->create();
     $shared = User::factory()->create(['role_id' => Role::factory()]);
-    $shared->teams()->attach([$team->getKey(), $otherTeam->getKey()]);
+    $shared->organizations()->attach([$organization->getKey(), $otherOrganization->getKey()]);
 
-    actingAsTeamMember($team, [userPermission('view'), userPermission('update'), userPermission('delete')]);
+    actingAsOrganizationMember($organization, [userPermission('view'), userPermission('update'), userPermission('delete')]);
 
-    $shared->load('teams');
+    $shared->load('organizations');
 
     expect(Gate::allows('update', $shared))->toBeFalse()
         ->and(Gate::allows('delete', $shared))->toBeTrue();
@@ -180,15 +180,15 @@ it('only removes users shared with other teams from the current team', function 
         ->callTableBulkAction(DeleteBulkAction::class, [$shared]);
 
     expect($shared->fresh()->trashed())->toBeFalse()
-        ->and($shared->teams()->pluck('teams.id')->all())->toBe([$otherTeam->getKey()]);
+        ->and($shared->organizations()->pluck('organizations.id')->all())->toBe([$otherOrganization->getKey()]);
 });
 
-it('deletes users removed from their last team', function (): void {
-    $team = Team::factory()->create();
+it('deletes users removed from their last organization', function (): void {
+    $organization = Organization::factory()->create();
     $member = User::factory()->create(['role_id' => Role::factory()]);
-    $member->teams()->attach($team);
+    $member->organizations()->attach($organization);
 
-    actingAsTeamMember($team, [userPermission('view'), userPermission('update'), userPermission('delete')]);
+    actingAsOrganizationMember($organization, [userPermission('view'), userPermission('update'), userPermission('delete')]);
 
     Livewire::test(EditUser::class, ['record' => $member->getRouteKey()])
         ->callAction(DeleteAction::class);
@@ -196,116 +196,116 @@ it('deletes users removed from their last team', function (): void {
     expect($member->fresh()->trashed())->toBeTrue();
 });
 
-it('keeps teams and roles for administrators only', function (): void {
-    $team = Team::factory()->create();
+it('keeps organizations and roles for administrators only', function (): void {
+    $organization = Organization::factory()->create();
 
-    actingAsTeamMember($team, [
-        PermissionRegistry::permissionKey(TeamResource::class, 'view'),
+    actingAsOrganizationMember($organization, [
+        PermissionRegistry::permissionKey(OrganizationResource::class, 'view'),
         PermissionRegistry::permissionKey(RoleResource::class, 'view'),
     ]);
 
-    get(TeamResource::getUrl('index', tenant: $team))->assertForbidden();
-    get(RoleResource::getUrl('index', tenant: $team))->assertForbidden();
+    get(OrganizationResource::getUrl('index', tenant: $organization))->assertForbidden();
+    get(RoleResource::getUrl('index', tenant: $organization))->assertForbidden();
 
     expect(collect(resolve(PermissionRegistry::class)->groups())->pluck('resource'))
-        ->not->toContain(TeamResource::class, RoleResource::class);
+        ->not->toContain(OrganizationResource::class, RoleResource::class);
 });
 
-it('lets administrators manage teams', function (): void {
-    $team = Team::factory()->create();
+it('lets administrators manage organizations', function (): void {
+    $organization = Organization::factory()->create();
 
-    actingAsTeamMember(null, null);
+    actingAsOrganizationMember(null, null);
 
-    get(TeamResource::getUrl('index', tenant: $team))->assertOk();
-    get(RoleResource::getUrl('index', tenant: $team))->assertOk();
+    get(OrganizationResource::getUrl('index', tenant: $organization))->assertOk();
+    get(RoleResource::getUrl('index', tenant: $organization))->assertOk();
 });
 
-it('shows the name and the e-mail of the users in the team form', function (): void {
-    $team = Team::factory()->create();
+it('shows the name and the e-mail of the users in the organization form', function (): void {
+    $organization = Organization::factory()->create();
     $member = User::factory()->create(['name' => 'Maria Souza', 'email' => 'maria@gmail.com']);
 
-    actingAsTeamMember(null, null);
-    Filament::setTenant($team);
+    actingAsOrganizationMember(null, null);
+    Filament::setTenant($organization);
 
-    Livewire::test(CreateTeam::class)
+    Livewire::test(CreateOrganization::class)
         ->assertFormFieldExists('general.users', static fn (Select $field): bool => $field->getOptionLabelFromRecord($member) === 'Maria Souza (maria@gmail.com)');
 });
 
-it('creates teams in a modal from the tenant menu', function (): void {
-    $team = Team::factory()->create();
+it('creates organizations in a modal from the tenant menu', function (): void {
+    $organization = Organization::factory()->create();
     $member = User::factory()->create();
 
-    actingAsTeamMember(null, null);
-    Filament::setTenant($team);
+    actingAsOrganizationMember(null, null);
+    Filament::setTenant($organization);
 
     Livewire::test(Sidebar::class)
         ->mountAction('register')
         ->set('mountedActions.0.data', [
-            'name' => 'Nova Equipe',
-            'slug' => 'nova-equipe',
+            'name' => 'Nova Organização',
+            'slug' => 'nova-organizacao',
             'users' => [$member->getKey()],
         ])
         ->callMountedAction()
-        ->assertRedirect(Filament::getUrl(Team::query()->firstWhere('slug', 'nova-equipe')));
+        ->assertRedirect(Filament::getUrl(Organization::query()->firstWhere('slug', 'nova-organizacao')));
 
-    expect(Team::query()->firstWhere('slug', 'nova-equipe')->users->modelKeys())->toBe([$member->getKey()]);
+    expect(Organization::query()->firstWhere('slug', 'nova-organizacao')->users->modelKeys())->toBe([$member->getKey()]);
 });
 
-it('shows the avatar of the team in the tenant menu instead of the initials', function (): void {
+it('shows the avatar of the organization in the tenant menu instead of the initials', function (): void {
     Storage::fake('public');
 
-    $team = Team::factory()->create(['avatar' => 'team/avatar/logo.jpg']);
-    $withoutAvatar = Team::factory()->create();
+    $organization = Organization::factory()->create(['avatar' => 'organization/avatar/logo.jpg']);
+    $withoutAvatar = Organization::factory()->create();
 
-    actingAsTeamMember(null, null);
+    actingAsOrganizationMember(null, null);
 
-    expect(Filament::getTenantAvatarUrl($team))->toBe(Storage::url('team/avatar/logo.jpg'))
+    expect(Filament::getTenantAvatarUrl($organization))->toBe(Storage::url('organization/avatar/logo.jpg'))
         ->and($withoutAvatar->getFilamentAvatarUrl())->toBeNull();
 });
 
-it('only accepts team slugs that work as subdomains', function (string $slug, string $rule): void {
-    actingAsTeamMember(null, null);
-    Filament::setTenant(Team::factory()->create());
+it('only accepts organization slugs that work as subdomains', function (string $slug, string $rule): void {
+    actingAsOrganizationMember(null, null);
+    Filament::setTenant(Organization::factory()->create());
 
-    Livewire::test(CreateTeam::class)
-        ->fillForm(['name' => 'Equipe', 'slug' => $slug])
+    Livewire::test(CreateOrganization::class)
+        ->fillForm(['name' => 'Organização', 'slug' => $slug])
         ->call('create')
         ->assertHasFormErrors(['slug' => $rule]);
 })->with([
     'reserved' => ['admix', 'not_in'],
-    'uppercase' => ['Equipe', 'regex'],
-    'underscore' => ['minha_equipe', 'regex'],
+    'uppercase' => ['Organização', 'regex'],
+    'underscore' => ['minha_organizacao', 'regex'],
 ]);
 
-it('hides the new team action from users that are not administrators', function (): void {
-    actingAsTeamMember(Team::factory()->create());
+it('hides the new organization action from users that are not administrators', function (): void {
+    actingAsOrganizationMember(Organization::factory()->create());
 
     Livewire::test(Sidebar::class)
         ->assertActionDoesNotExist('register');
 });
 
-it('scopes the models that belong to a team and fills the current team', function (): void {
-    Schema::create('team_notes', static function (Blueprint $table): void {
+it('scopes the models that belong to a organization and fills the current organization', function (): void {
+    Schema::create('organization_notes', static function (Blueprint $table): void {
         $table->id();
-        $table->foreignId('team_id');
+        $table->foreignId('organization_id');
         $table->string('title');
         $table->timestamps();
     });
 
-    $team = Team::factory()->create();
-    $otherTeam = Team::factory()->create();
+    $organization = Organization::factory()->create();
+    $otherOrganization = Organization::factory()->create();
 
     actingAs(User::factory()->create(), 'admix-web');
-    Filament::setTenant($otherTeam);
-    TeamNote::query()->create(['title' => 'Other']);
+    Filament::setTenant($otherOrganization);
+    OrganizationNote::query()->create(['title' => 'Other']);
 
-    Filament::setTenant($team);
-    $note = TeamNote::query()->create(['title' => 'Mine']);
+    Filament::setTenant($organization);
+    $note = OrganizationNote::query()->create(['title' => 'Mine']);
 
-    expect($note->team_id)->toBe($team->getKey())
-        ->and(TeamNote::query()->pluck('title')->all())->toBe(['Mine']);
+    expect($note->organization_id)->toBe($organization->getKey())
+        ->and(OrganizationNote::query()->pluck('title')->all())->toBe(['Mine']);
 
     config(['filament-admix.tenancy.enabled' => false]);
 
-    expect(TeamNote::query()->count())->toBe(2);
+    expect(OrganizationNote::query()->count())->toBe(2);
 });

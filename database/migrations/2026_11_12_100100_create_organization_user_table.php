@@ -10,17 +10,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('team_user', static function (Blueprint $table): void {
+        Schema::create('organization_user', static function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('team_id')
-                ->constrained('teams')
+            $table->foreignId('organization_id')
+                ->constrained('organizations')
                 ->cascadeOnDelete();
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['team_id', 'user_id']);
+            $table->unique(['organization_id', 'user_id']);
         });
     }
 };

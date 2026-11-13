@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Models;
 
-use Agenciafmd\Admix\Database\Factories\TeamFactory;
+use Agenciafmd\Admix\Database\Factories\OrganizationFactory;
 use Agenciafmd\Admix\Traits\WithScopes;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
@@ -20,14 +20,14 @@ use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
- * Team (tenant) of the admix panel, used when `filament-admix.tenancy.enabled` is on.
+ * Organization (tenant) of the admix panel, used when `filament-admix.tenancy.enabled` is on.
  */
-#[UseFactory(TeamFactory::class)]
-final class Team extends Model implements AuditableContract, HasAvatar
+#[UseFactory(OrganizationFactory::class)]
+final class Organization extends Model implements AuditableContract, HasAvatar
 {
     use Auditable;
 
-    /** @use HasFactory<TeamFactory> */
+    /** @use HasFactory<OrganizationFactory> */
     use HasFactory;
 
     use Prunable;
@@ -48,7 +48,7 @@ final class Team extends Model implements AuditableContract, HasAvatar
     }
 
     /**
-     * Slugs that teams cannot use, because the slug also names the subdomain of the team.
+     * Slugs that organizations cannot use, because the slug also names the subdomain of the organization.
      *
      * @return array<int, string>
      */
@@ -63,7 +63,7 @@ final class Team extends Model implements AuditableContract, HasAvatar
     }
 
     /**
-     * Image shown in the tenant menu in place of the initials of the team.
+     * Image shown in the tenant menu in place of the initials of the organization.
      */
     public function getFilamentAvatarUrl(): ?string
     {

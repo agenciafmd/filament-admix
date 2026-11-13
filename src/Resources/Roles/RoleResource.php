@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Roles;
 
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\Role;
-use Agenciafmd\Admix\Models\Team;
 use Agenciafmd\Admix\Resources\Roles\Pages\CreateRole;
 use Agenciafmd\Admix\Resources\Roles\Pages\EditRole;
 use Agenciafmd\Admix\Resources\Roles\Pages\ListRoles;
@@ -39,11 +39,11 @@ final class RoleResource extends Resource
     protected static bool $isScopedToTenant = false;
 
     /**
-     * With the tenancy enabled, roles are shared by every team, so only administrators manage them.
+     * With the tenancy enabled, roles are shared by every organization, so only administrators manage them.
      */
     public static function isAdministratorsOnly(): bool
     {
-        return Team::isTenancyEnabled();
+        return Organization::isTenancyEnabled();
     }
 
     #[Override]

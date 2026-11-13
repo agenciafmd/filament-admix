@@ -39,8 +39,8 @@
     "audit": "auditoria",
     "Resource": "Recurso",
     "Others": "Outros",
-    "Team": "Equipe",
-    "Teams": "Equipes",
-    "New team": "Nova equipe",
-    "Also names the subdomain of the team.": "Também é o subdomínio da equipe."
+    "Organization": "Organização",
+    "Organizations": "Organizações",
+    "New organization": "Nova organização",
+    "Also names the subdomain of the organization.": "Também é o subdomínio da organização."
 }

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Agenciafmd\Admix\Providers;
 
 use Agenciafmd\Admix\Http\Middleware\AutoLogin;
-use Agenciafmd\Admix\Models\Team;
+use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
 use Agenciafmd\Admix\Policies\ResourcePolicy;
 use Agenciafmd\Admix\Resources\Auth\Pages\EditProfile;
 use Agenciafmd\Admix\Resources\Auth\Pages\Login;
-use Agenciafmd\Admix\Resources\Teams\Pages\RegisterTeam;
+use Agenciafmd\Admix\Resources\Organizations\Pages\RegisterOrganization;
 use Filament\Contracts\Plugin;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -135,11 +135,11 @@ final class FilamentPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->when(Team::isTenancyEnabled(), static fn (Panel $panel): Panel => $panel
-                ->tenant(Team::class, slugAttribute: 'slug')
-                ->tenantRegistration(RegisterTeam::class)
+            ->when(Organization::isTenancyEnabled(), static fn (Panel $panel): Panel => $panel
+                ->tenant(Organization::class, slugAttribute: 'slug')
+                ->tenantRegistration(RegisterOrganization::class)
                 ->tenantMenuItems([
-                    'register' => RegisterTeam::modalAction(...),
+                    'register' => RegisterOrganization::modalAction(...),
                 ]))
             ->viteTheme('resources/filament/filament-admix/css/theme.css', 'filament-admix');
     }
@@ -237,7 +237,7 @@ final class FilamentPanelProvider extends PanelProvider
         Gate::before(static function (mixed $user, string $ability, array $arguments) use ($registry): ?bool {
             $model = $arguments[0] ?? null;
 
-            if (! $user instanceof User || ! $model instanceof Model && ! is_string($model)) {
+            if (! $user instanceof User || (! $model instanceof Model && ! is_string($model))) {
                 return null;
             }
 
