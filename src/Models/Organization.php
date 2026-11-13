@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Override;
 use OwenIt\Auditing\Auditable;
@@ -21,6 +22,15 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * Organization (tenant) of the admix panel, used when `filament-admix.tenancy.enabled` is on.
+ *
+ * @property int $id
+ * @property bool $is_active
+ * @property string $name
+ * @property string $slug
+ * @property string|null $avatar
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  */
 #[UseFactory(OrganizationFactory::class)]
 final class Organization extends Model implements AuditableContract, HasAvatar
