@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Providers;
 
+use Agenciafmd\Admix\Http\Controllers\LeaveImpersonationController;
 use Agenciafmd\Admix\Http\Middleware\AutoLogin;
 use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
@@ -48,6 +49,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Override;
@@ -60,6 +62,7 @@ final class FilamentPanelProvider extends PanelProvider
         $this->bootDefaultSectionConfigs();
         $this->bootDefaultFormComponents();
         $this->bootStagingAlert();
+        $this->bootImpersonationBanner();
         $this->bootPermissions();
     }
 
@@ -135,6 +138,10 @@ final class FilamentPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->authenticatedRoutes(static function (): void {
+                Route::post('impersonation/leave', LeaveImpersonationController::class)
+                    ->name('impersonation.leave');
+            })
             ->when(Organization::isTenancyEnabled(), static fn (Panel $panel): Panel => $panel
                 ->tenant(Organization::class, slugAttribute: 'slug')
                 ->tenantRegistration(RegisterOrganization::class)
@@ -260,6 +267,16 @@ final class FilamentPanelProvider extends PanelProvider
         FilamentView::registerRenderHook(
             PanelsRenderHook::BODY_START,
             fn (): string => Blade::render('filament-admix::filament.staging-banner'),
+        );
+    }
+
+    private function bootImpersonationBanner(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_START,
+            static fn (): string => User::isImpersonating() && ($user = auth()->user()) instanceof User
+                ? Blade::render('filament-admix::filament.impersonation-banner', ['user' => $user])
+                : '',
         );
     }
 }

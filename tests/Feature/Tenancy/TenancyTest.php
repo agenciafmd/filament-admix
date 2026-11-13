@@ -19,6 +19,7 @@ use Agenciafmd\Admix\Testing\WithTenancy;
 use Agenciafmd\Admix\Traits\BelongsToOrganization;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Livewire\Sidebar;
@@ -308,4 +309,18 @@ it('scopes the models that belong to a organization and fills the current organi
     config(['filament-admix.tenancy.enabled' => false]);
 
     expect(OrganizationNote::query()->count())->toBe(2);
+});
+
+it('impersonates users in their own organization', function (): void {
+    config(['filament-admix.impersonate' => true]);
+
+    $organization = Organization::factory()->create();
+    $member = User::factory()->create(['role_id' => Role::factory()]);
+    $member->organizations()->attach(Organization::factory()->create());
+
+    actingAsOrganizationMember($organization, null);
+
+    Livewire::test(ListUsers::class)
+        ->callAction(TestAction::make('impersonate')->table($member))
+        ->assertRedirect(Dashboard::getUrl(panel: 'admix', tenant: $member->organizations()->first()));
 });

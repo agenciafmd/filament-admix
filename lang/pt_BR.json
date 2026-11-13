@@ -42,5 +42,8 @@
     "Organization": "Organização",
     "Organizations": "Organizações",
     "New organization": "Nova organização",
-    "Also names the subdomain of the organization.": "Também é o subdomínio da organização."
+    "Also names the subdomain of the organization.": "Também é o subdomínio da organização.",
+    "Impersonate": "Acessar como",
+    "You are accessing as :name.": "Você está acessando como :name.",
+    "Back to my account": "Voltar para minha conta"
 }

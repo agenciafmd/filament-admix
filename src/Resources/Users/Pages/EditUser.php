@@ -6,6 +6,7 @@ namespace Agenciafmd\Admix\Resources\Users\Pages;
 
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
+use Agenciafmd\Admix\Resources\Users\Actions\ImpersonateAction;
 use Agenciafmd\Admix\Resources\Users\UserResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -45,6 +46,7 @@ final class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            ImpersonateAction::make(),
             DeleteAction::make()
                 ->using(fn (User $record): bool => UserResource::deleteRecord($record)),
         ];

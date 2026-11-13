@@ -108,6 +108,16 @@ O Resource que declara `public static function isAdministratorsOnly(): bool` ret
 administradores e sai da matriz de permissões dos Grupos. O admix usa isso em `OrganizationResource` (sempre) e em
 `RoleResource` (com a tenancy ligada).
 
+## Acessar como (impersonate)
+
+A action `Agenciafmd\Admix\Resources\Users\Actions\ImpersonateAction` (na tabela e na edição de Usuários) deixa o
+administrador entrar no painel como outro usuário, para ver o que ele vê:
+- fica desligada por padrão; ligue com `filament-admix.impersonate` (env `ADMIX_IMPERSONATE`);
+- só administradores usam, e só com usuários com grupo, ativos e com acesso ao painel (`$user->canImpersonate($target)`);
+- o id do administrador fica na sessão; `User::isImpersonating()` diz se a sessão é de impersonate;
+- um banner no topo do painel tem o botão "Voltar para minha conta" (rota `filament.admix.impersonation.leave`), que
+  volta para o administrador; se ele perdeu o acesso de administrador, a sessão é encerrada.
+
 ## Organizações (tenancy)
 
 A tenancy usa a tenancy nativa do Filament e vem desligada (`filament-admix.tenancy.enabled`, env `ADMIX_TENANCY`).

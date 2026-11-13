@@ -52,6 +52,8 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
     use SoftDeletes;
     use WithScopes;
 
+    private const string IMPERSONATOR_SESSION_KEY = 'filament-admix.impersonator_id';
+
     #[Override]
     protected $attributes = [
         'type' => 'admix',
@@ -64,6 +66,30 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
         'is_active' => 'desc',
         'name' => 'asc',
     ];
+
+    public static function isImpersonating(): bool
+    {
+        return session()->has(self::IMPERSONATOR_SESSION_KEY);
+    }
+
+    /**
+     * Logs in as the administrator again. Without an active administrator, logs out.
+     */
+    public static function leaveImpersonation(): ?self
+    {
+        $impersonatorId = session()->pull(self::IMPERSONATOR_SESSION_KEY);
+        $impersonator = is_int($impersonatorId) ? self::query()->find($impersonatorId) : null;
+
+        if (! $impersonator instanceof self || ! $impersonator->isAdmin() || ! $impersonator->is_active) {
+            Filament::auth()->logout();
+
+            return null;
+        }
+
+        Filament::auth()->login($impersonator);
+
+        return $impersonator;
+    }
 
     public function getFilamentAvatarUrl(): ?string
     {
@@ -170,6 +196,29 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
     public function isAdmin(): bool
     {
         return $this->role_id === null;
+    }
+
+    /**
+     * With `filament-admix.impersonate` enabled, administrators can access the panel as any other user with a role
+     * that can access it.
+     */
+    public function canImpersonate(self $user): bool
+    {
+        return config()->boolean('filament-admix.impersonate', false)
+            && $this->isAdmin()
+            && ! $user->isAdmin()
+            && ! $user->trashed()
+            && $user->canAccessPanel(Filament::getPanel('admix'));
+    }
+
+    /**
+     * Logs in as the user and keeps the administrator in the session, to come back later.
+     */
+    public function impersonate(self $user): void
+    {
+        Filament::auth()->login($user);
+
+        session()->put(self::IMPERSONATOR_SESSION_KEY, $this->getKey());
     }
 
     public function hasPermission(string $permission): bool

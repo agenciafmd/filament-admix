@@ -20,6 +20,10 @@ return [
      */
     'auto_login' => env('ADMIX_AUTO_LOGIN', true),
     /*
+     * Lets administrators access the panel as another user (users with a role only).
+     */
+    'impersonate' => env('ADMIX_IMPERSONATE', false),
+    /*
      * Organizations (multi-tenant): each user only sees the organizations they belong to.
      * Administrators (users without a role) access every organization.
      */

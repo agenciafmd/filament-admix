@@ -6,6 +6,7 @@ namespace Agenciafmd\Admix\Resources\Users\Tables;
 
 use Agenciafmd\Admix\Models\Organization;
 use Agenciafmd\Admix\Models\User;
+use Agenciafmd\Admix\Resources\Users\Actions\ImpersonateAction;
 use Agenciafmd\Admix\Resources\Users\UserResource;
 // use Agenciafmd\Admix\Resources\Users\Exports\UserExporter;
 use Filament\Actions\BulkActionGroup;
@@ -59,6 +60,7 @@ final class UsersTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                ImpersonateAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([
