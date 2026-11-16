@@ -17,6 +17,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Override;
 use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
 
 final class UserResource extends Resource
@@ -28,6 +29,14 @@ final class UserResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    #[Override]
+    public static function getNavigationGroup(): ?string
+    {
+        $navigationGroup = config('filament-admix.navigation_group');
+
+        return is_string($navigationGroup) ? $navigationGroup : null;
+    }
 
     public static function getModelLabel(): string
     {

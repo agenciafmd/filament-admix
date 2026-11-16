@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filament\Support\Colors\Color;
 
 return [
+    'navigation_group' => null,
     'schedule' => [
         'minutes' => sprintf('%02d', abs(crc32((string) env('APP_NAME', 'FMD'))) % 60),
     ],

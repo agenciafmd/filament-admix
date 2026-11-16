@@ -31,6 +31,14 @@ final class RoleResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     #[Override]
+    public static function getNavigationGroup(): ?string
+    {
+        $navigationGroup = config('filament-admix.navigation_group');
+
+        return is_string($navigationGroup) ? $navigationGroup : null;
+    }
+
+    #[Override]
     public static function getModelLabel(): string
     {
         return __('Role');
