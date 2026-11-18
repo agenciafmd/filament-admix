@@ -6,6 +6,7 @@ namespace Agenciafmd\Admix\Providers;
 
 use Agenciafmd\Admix\Commands\AdmixCreateUser;
 use Agenciafmd\Admix\Commands\AuditPrune;
+use Agenciafmd\Admix\Commands\MediaPrune;
 use Agenciafmd\Admix\Commands\NotificationsClear;
 use Agenciafmd\Admix\Models\Role;
 use Agenciafmd\Admix\Models\User;
@@ -24,6 +25,7 @@ final class CommandServiceProvider extends ServiceProvider
         $this->commands([
             AdmixCreateUser::class,
             AuditPrune::class,
+            MediaPrune::class,
             NotificationsClear::class,
         ]);
 
