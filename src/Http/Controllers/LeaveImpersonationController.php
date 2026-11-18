@@ -21,7 +21,7 @@ final class LeaveImpersonationController
         $impersonator = User::leaveImpersonation();
 
         if (! $impersonator instanceof User) {
-            return redirect()->to(Filament::getLoginUrl());
+            return redirect()->to(Filament::getLoginUrl() ?? url('/'));
         }
 
         if (! Filament::hasTenancy()) {
@@ -30,6 +30,6 @@ final class LeaveImpersonationController
 
         $organization = Filament::getUserDefaultTenant($impersonator);
 
-        return redirect()->to($organization === null ? Filament::getUrl() : UserResource::getUrl('index', tenant: $organization));
+        return redirect()->to($organization === null ? Filament::getUrl() ?? url('/') : UserResource::getUrl('index', tenant: $organization));
     }
 }

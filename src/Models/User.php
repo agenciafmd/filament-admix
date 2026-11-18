@@ -204,11 +204,14 @@ final class User extends Authenticatable implements AuditableContract, FilamentU
      */
     public function canImpersonate(self $user): bool
     {
+        $panel = Filament::getPanel('admix');
+
         return config()->boolean('filament-admix.impersonate', false)
             && $this->isAdmin()
             && ! $user->isAdmin()
             && ! $user->trashed()
-            && $user->canAccessPanel(Filament::getPanel('admix'));
+            && $panel instanceof Panel
+            && $user->canAccessPanel($panel);
     }
 
     /**
