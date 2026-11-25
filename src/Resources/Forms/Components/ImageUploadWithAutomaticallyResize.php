@@ -44,7 +44,7 @@ final class ImageUploadWithAutomaticallyResize
     private static function store(FileUpload $component, TemporaryUploadedFile $file, string $format, int $quality): string
     {
         $image = new ImageManager(new Driver)
-            ->read($file->getRealPath())
+            ->decodePath($file->getRealPath())
             ->cover(
                 width: (int) $component->getAutomaticallyResizeImagesWidth(),
                 height: (int) $component->getAutomaticallyResizeImagesHeight(),
@@ -57,7 +57,7 @@ final class ImageUploadWithAutomaticallyResize
             ->ltrim('/')
             ->toString();
 
-        $component->getDisk()->put($path, (string) $image->encodeByExtension($format, quality: $quality));
+        $component->getDisk()->put($path, (string) $image->encodeUsingFileExtension($format, quality: $quality));
 
         return $path;
     }
