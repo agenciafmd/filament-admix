@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin Model
  */
+// @phpstan-ignore trait.unused (used by the models and tests of the projects)
 trait BelongsToOrganization
 {
     public static function bootBelongsToOrganization(): void

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Application;
  * Enables the admix tenancy in a test case. The panel routes depend on the tenancy, so the
  * config is set before the application boots: `pest()->extend(TestCase::class)->use(WithTenancy::class)`.
  */
+// @phpstan-ignore trait.unused (used by the models and tests of the projects)
 trait WithTenancy
 {
     public function createApplication(): Application
