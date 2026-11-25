@@ -167,7 +167,7 @@ it('renders the permission matrix on the role form', function (): void {
     actingAsAdmixUser();
 
     Livewire::test(CreateRole::class)
-        ->call('loadDeferredSchema', 'form.permissions')
+        ->call('loadLazySchema', 'form.permissions')
         ->call('$refresh')
         ->assertSee(ArticleResource::getPluralModelLabel())
         ->assertSee(__('send'));
