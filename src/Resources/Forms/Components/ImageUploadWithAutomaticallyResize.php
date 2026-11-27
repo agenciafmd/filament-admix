@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Admix\Resources\Forms\Components;
 
+use Agenciafmd\Support\Jobs\OptimizeImage;
 use Closure;
 use Filament\Forms\Components\FileUpload;
 use Intervention\Image\Drivers\Imagick\Driver;
@@ -58,6 +59,8 @@ final class ImageUploadWithAutomaticallyResize
             ->toString();
 
         $component->getDisk()->put($path, (string) $image->encodeUsingFileExtension($format, quality: $quality));
+
+        OptimizeImage::dispatchIf(config()->boolean('filament-admix.fileupload_image_optimize', true), $component->getDiskName(), $path);
 
         return $path;
     }

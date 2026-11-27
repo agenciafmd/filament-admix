@@ -24,6 +24,12 @@ return [
      */
     'impersonate' => env('ADMIX_IMPERSONATE', false),
     /*
+     * Queues the optimization of the images uploaded by the FileUpload and attached to the RichEditor.
+     * Without the key, the optimization stays enabled.
+     */
+    'fileupload_image_optimize' => env('ADMIX_FILEUPLOAD_IMAGE_OPTIMIZE', true),
+    'richeditor_image_optimize' => env('ADMIX_RICHEDITOR_IMAGE_OPTIMIZE', true),
+    /*
      * Organizations (multi-tenant): each user only sees the organizations they belong to.
      * Administrators (users without a role) access every organization.
      */

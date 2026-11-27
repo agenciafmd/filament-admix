@@ -13,7 +13,10 @@ use Agenciafmd\Admix\Policies\ResourcePolicy;
 use Agenciafmd\Admix\Resources\Auth\Pages\EditProfile;
 use Agenciafmd\Admix\Resources\Auth\Pages\Login;
 use Agenciafmd\Admix\Resources\Organizations\Pages\RegisterOrganization;
+use Agenciafmd\Support\Jobs\OptimizeImage;
 use Filament\Contracts\Plugin;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -52,6 +55,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Override;
 
 final class FilamentPanelProvider extends PanelProvider
@@ -61,6 +65,7 @@ final class FilamentPanelProvider extends PanelProvider
         $this->bootDefaultTableConfigs();
         $this->bootDefaultSectionConfigs();
         $this->bootDefaultFormComponents();
+        $this->bootImageOptimization();
         $this->bootStagingAlert();
         $this->bootImpersonationBanner();
         $this->bootPermissions();
@@ -225,6 +230,58 @@ final class FilamentPanelProvider extends PanelProvider
                     ->slug()
                     ->toString());
             }));
+    }
+
+    /**
+     * Enfileira a otimização de todo arquivo enviado pelo FileUpload e pelos anexos do RichEditor,
+     * conforme o `fileupload_image_optimize` e o `richeditor_image_optimize` do config (ligados quando ausentes).
+     * Componentes que salvam o arquivo por conta própria (`saveUploadedFileUsing()`) disparam o {@see OptimizeImage} eles mesmos.
+     */
+    private function bootImageOptimization(): void
+    {
+        FileUpload::configureUsing(static function (FileUpload $component): void {
+            $component->saveUploadedFileUsing(static function (FileUpload $component, TemporaryUploadedFile $file): ?string {
+                $path = $component->saveUploadedFile($file);
+
+                OptimizeImage::dispatchIf(
+                    filled($path) && config()->boolean('filament-admix.fileupload_image_optimize', true),
+                    $component->getDiskName(),
+                    (string) $path,
+                );
+
+                return $path;
+            });
+        });
+
+        RichEditor::configureUsing(static function (RichEditor $component): void {
+            $component->saveUploadedFileAttachmentUsing(static function (RichEditor $component, TemporaryUploadedFile $file): mixed {
+                /* anexos salvos por um provider (ex.: media library) seguem o fluxo dele */
+                if (filled($savedFile = $component->defaultSaveUploadedFileAttachment($file))) {
+                    return $savedFile;
+                }
+
+                $path = $file->store((string) $component->getFileAttachmentsDirectory(), [
+                    'disk' => $component->getFileAttachmentsDiskName(),
+                    'mimetype' => $file->getMimeType(),
+                ]);
+
+                if (! is_string($path)) {
+                    return $path;
+                }
+
+                if ($component->getFileAttachmentsVisibility() === 'public') {
+                    rescue(static fn (): bool => $component->getFileAttachmentsDisk()->setVisibility($path, 'public'), report: false);
+                }
+
+                OptimizeImage::dispatchIf(
+                    config()->boolean('filament-admix.richeditor_image_optimize', true),
+                    $component->getFileAttachmentsDiskName(),
+                    $path,
+                );
+
+                return $path;
+            });
+        });
     }
 
     /**
