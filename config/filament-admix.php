@@ -24,11 +24,13 @@ return [
      */
     'impersonate' => env('ADMIX_IMPERSONATE', false),
     /*
-     * Queues the optimization of the images uploaded by the FileUpload and attached to the RichEditor.
+     * Queues the optimization of the images uploaded by the FileUpload and attached to the RichEditor,
+     * and the conversion of the videos uploaded by the VideoUploadWithDefault.
      * Without the key, the optimization stays enabled.
      */
     'fileupload_image_optimize' => env('ADMIX_FILEUPLOAD_IMAGE_OPTIMIZE', true),
     'richeditor_image_optimize' => env('ADMIX_RICHEDITOR_IMAGE_OPTIMIZE', true),
+    'fileupload_video_optimize' => env('ADMIX_FILEUPLOAD_VIDEO_OPTIMIZE', true),
     /*
      * Organizations (multi-tenant): each user only sees the organizations they belong to.
      * Administrators (users without a role) access every organization.
