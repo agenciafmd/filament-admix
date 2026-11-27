@@ -20,8 +20,8 @@ final class VideoUploadWithAutomaticallyResize
         string $name,
         string $directory,
         string $fileNameField = 'name',
-        int|Closure $width = 1920,
-        int|Closure $height = 1080,
+        int|Closure $width = 1440,
+        int|Closure $height = 810,
         bool $mute = true,
     ): FileUpload {
         return FileUploadWithDefault::make(
