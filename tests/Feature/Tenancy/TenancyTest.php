@@ -18,7 +18,6 @@ use Agenciafmd\Admix\Resources\Users\UserResource;
 use Agenciafmd\Admix\Testing\WithTenancy;
 use Agenciafmd\Admix\Traits\BelongsToOrganization;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
@@ -178,7 +177,8 @@ it('only removes users shared with other organizations from the current organiza
         ->and(Gate::allows('delete', $shared))->toBeTrue();
 
     Livewire::test(ListUsers::class)
-        ->callTableBulkAction(DeleteBulkAction::class, [$shared]);
+        ->selectTableRecords([$shared])
+        ->callAction(TestAction::make('delete')->table()->bulk());
 
     expect($shared->fresh()->trashed())->toBeFalse()
         ->and($shared->organizations()->pluck('organizations.id')->all())->toBe([$otherOrganization->getKey()]);

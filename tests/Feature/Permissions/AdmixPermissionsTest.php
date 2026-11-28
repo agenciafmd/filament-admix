@@ -16,6 +16,7 @@ use Agenciafmd\Postal\Models\Postal;
 use Agenciafmd\Postal\Resources\Postal\Pages\ListPostal;
 use Agenciafmd\Postal\Resources\Postal\PostalResource;
 use Filament\Actions\CreateAction;
+use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
@@ -200,7 +201,7 @@ it('checks the extra abilities declared by the resource', function (): void {
     ])->create());
 
     Livewire::test(ListPostal::class)
-        ->assertTableActionHidden('send', $postal);
+        ->assertActionHidden(TestAction::make('send')->table($postal));
 
     actingAsAdmixUser(Role::factory()->withPermissions([
         PermissionRegistry::permissionKey(PostalResource::class, 'view'),
@@ -208,5 +209,5 @@ it('checks the extra abilities declared by the resource', function (): void {
     ])->create());
 
     Livewire::test(ListPostal::class)
-        ->assertTableActionVisible('send', $postal);
+        ->assertActionVisible(TestAction::make('send')->table($postal));
 });
