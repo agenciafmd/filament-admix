@@ -8,12 +8,10 @@ use Agenciafmd\Admix\Models\Role;
 use Agenciafmd\Admix\Models\User;
 use Agenciafmd\Admix\Permissions\PermissionRegistry;
 use Agenciafmd\Admix\Resources\Roles\Pages\CreateRole;
+use Agenciafmd\Admix\Resources\Roles\Pages\ListRoles;
 use Agenciafmd\Admix\Resources\Roles\RoleResource;
 use Agenciafmd\Admix\Resources\Users\Pages\EditUser;
 use Agenciafmd\Admix\Resources\Users\UserResource;
-use Agenciafmd\Articles\Models\Article;
-use Agenciafmd\Articles\Resources\Articles\ArticleResource;
-use Agenciafmd\Articles\Resources\Articles\Pages\ListArticles;
 use Agenciafmd\Postal\Models\Postal;
 use Agenciafmd\Postal\Resources\Postal\Pages\ListPostal;
 use Agenciafmd\Postal\Resources\Postal\PostalResource;
@@ -29,9 +27,9 @@ use function Pest\Laravel\get;
 
 pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
-function articlePermission(string $ability): string
+function rolePermission(string $ability): string
 {
-    return PermissionRegistry::permissionKey(ArticleResource::class, $ability);
+    return PermissionRegistry::permissionKey(RoleResource::class, $ability);
 }
 
 function actingAsAdmixUser(?Role $role = null): User
@@ -49,82 +47,82 @@ function actingAsAdmixUser(?Role $role = null): User
 it('lets users without a role access every resource', function (): void {
     actingAsAdmixUser();
 
-    get(ArticleResource::getUrl('index'))->assertOk();
-    get(ArticleResource::getUrl('create'))->assertOk();
     get(RoleResource::getUrl('index'))->assertOk();
+    get(RoleResource::getUrl('create'))->assertOk();
+    get(UserResource::getUrl('index'))->assertOk();
 });
 
 it('denies resources the role has no permission for', function (): void {
     actingAsAdmixUser(Role::factory()->create());
 
-    get(ArticleResource::getUrl('index'))->assertForbidden();
-    get(ArticleResource::getUrl('create'))->assertForbidden();
-    get(ArticleResource::getUrl('edit', ['record' => Article::factory()->create()]))->assertForbidden();
+    get(RoleResource::getUrl('index'))->assertForbidden();
+    get(RoleResource::getUrl('create'))->assertForbidden();
+    get(RoleResource::getUrl('edit', ['record' => Role::factory()->create()]))->assertForbidden();
 
-    expect(ArticleResource::canAccess())->toBeFalse();
+    expect(RoleResource::canAccess())->toBeFalse();
 });
 
 it('grants only the abilities checked in the role', function (): void {
-    actingAsAdmixUser(Role::factory()->withPermissions([articlePermission('view')])->create());
+    actingAsAdmixUser(Role::factory()->withPermissions([rolePermission('view')])->create());
 
-    get(ArticleResource::getUrl('index'))->assertOk();
-    get(ArticleResource::getUrl('create'))->assertForbidden();
+    get(RoleResource::getUrl('index'))->assertOk();
+    get(RoleResource::getUrl('create'))->assertForbidden();
 
-    Livewire::test(ListArticles::class)
+    Livewire::test(ListRoles::class)
         ->assertActionHidden(CreateAction::class);
 
-    $article = Article::factory()->create();
+    $managedRole = Role::factory()->create();
 
-    expect(Gate::allows('update', $article))->toBeFalse()
-        ->and(Gate::allows('deleteAny', Article::class))->toBeFalse();
+    expect(Gate::allows('update', $managedRole))->toBeFalse()
+        ->and(Gate::allows('deleteAny', Role::class))->toBeFalse();
 });
 
 it('maps grouped abilities to every related policy method', function (): void {
-    actingAsAdmixUser(Role::factory()->withPermissions([articlePermission('delete'), articlePermission('restore')])->create());
+    actingAsAdmixUser(Role::factory()->withPermissions([rolePermission('delete'), rolePermission('restore')])->create());
 
-    $article = Article::factory()->create();
+    $managedRole = Role::factory()->create();
 
-    expect(Gate::allows('delete', $article))->toBeTrue()
-        ->and(Gate::allows('deleteAny', Article::class))->toBeTrue()
-        ->and(Gate::allows('forceDelete', $article))->toBeTrue()
-        ->and(Gate::allows('restoreAny', Article::class))->toBeTrue()
-        ->and(Gate::allows('update', $article))->toBeFalse();
+    expect(Gate::allows('delete', $managedRole))->toBeTrue()
+        ->and(Gate::allows('deleteAny', Role::class))->toBeTrue()
+        ->and(Gate::allows('forceDelete', $managedRole))->toBeTrue()
+        ->and(Gate::allows('restoreAny', Role::class))->toBeTrue()
+        ->and(Gate::allows('update', $managedRole))->toBeFalse();
 });
 
 it('denies everything when the role is inactive or deleted', function (): void {
-    $role = Role::factory()->inactive()->withPermissions([articlePermission('view')])->create();
+    $role = Role::factory()->inactive()->withPermissions([rolePermission('view')])->create();
 
     $user = actingAsAdmixUser($role);
 
-    get(ArticleResource::getUrl('index'))->assertForbidden();
+    get(RoleResource::getUrl('index'))->assertForbidden();
 
     $role->update(['is_active' => true]);
     $role->delete();
 
     expect($user->fresh()->isAdmin())->toBeFalse()
-        ->and($user->fresh()->hasPermission(articlePermission('view')))->toBeFalse();
+        ->and($user->fresh()->hasPermission(rolePermission('view')))->toBeFalse();
 });
 
 it('controls the audit gates with the audit ability', function (): void {
-    actingAsAdmixUser(Role::factory()->withPermissions([articlePermission('audit')])->create());
+    actingAsAdmixUser(Role::factory()->withPermissions([rolePermission('audit')])->create());
 
-    $article = Article::factory()->create();
+    $managedRole = Role::factory()->create();
 
-    expect(Gate::allows('audit', $article))->toBeTrue()
-        ->and(Gate::allows('restoreAudit', $article))->toBeFalse();
+    expect(Gate::allows('audit', $managedRole))->toBeTrue()
+        ->and(Gate::allows('restoreAudit', $managedRole))->toBeFalse();
 });
 
 it('lists the permissions of every panel resource', function (): void {
     $groups = collect(resolve(PermissionRegistry::class)->groups())->keyBy('resource');
 
-    expect($groups)->toHaveKeys([ArticleResource::class, UserResource::class, RoleResource::class])
-        ->and($groups[ArticleResource::class]['permissions'])->toHaveKeys([
-            articlePermission('view'),
-            articlePermission('create'),
-            articlePermission('update'),
-            articlePermission('delete'),
-            articlePermission('restore'),
-            articlePermission('audit'),
+    expect($groups)->toHaveKeys([RoleResource::class, UserResource::class])
+        ->and($groups[RoleResource::class]['permissions'])->toHaveKeys([
+            rolePermission('view'),
+            rolePermission('create'),
+            rolePermission('update'),
+            rolePermission('delete'),
+            rolePermission('restore'),
+            rolePermission('audit'),
         ]);
 });
 
@@ -136,15 +134,15 @@ it('saves the checked permissions on the role', function (): void {
             'name' => 'Editors',
             'is_active' => true,
             'permissions' => [
-                articlePermission('view'),
-                articlePermission('update'),
+                rolePermission('view'),
+                rolePermission('update'),
             ],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     expect(Role::query()->firstWhere('name', 'Editors')->permissions)
-        ->toBe([articlePermission('view'), articlePermission('update')]);
+        ->toBe([rolePermission('view'), rolePermission('update')]);
 });
 
 it('drops unknown permission keys when saving the role', function (): void {
@@ -154,13 +152,13 @@ it('drops unknown permission keys when saving the role', function (): void {
         ->fillForm([
             'name' => 'Editors',
             'is_active' => true,
-            'permissions' => [articlePermission('view'), 'Unknown\\Resource@view'],
+            'permissions' => [rolePermission('view'), 'Unknown\\Resource@view'],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     expect(Role::query()->firstWhere('name', 'Editors')->permissions)
-        ->toBe([articlePermission('view')]);
+        ->toBe([rolePermission('view')]);
 });
 
 it('renders the permission matrix on the role form', function (): void {
@@ -169,7 +167,7 @@ it('renders the permission matrix on the role form', function (): void {
     Livewire::test(CreateRole::class)
         ->call('loadLazySchema', 'form.permissions')
         ->call('$refresh')
-        ->assertSee(ArticleResource::getPluralModelLabel())
+        ->assertSee(RoleResource::getPluralModelLabel())
         ->assertSee(__('send'));
 });
 
